@@ -86,8 +86,11 @@ if __name__ == '__main__':
         conf = json.load(f)
         feature = Feature()
         feature.load_data(conf)
-        feature.generate_user_feature_by_topk_open_appid(conf['app_usage_topK'])
-
+        feature_list = feature.generate_user_feature_by_topk_open_appid(conf['app_usage_topK'])
+        with open('user_appid_open_feature', 'w') as f:
+            for fi in feature_list:
+                f.write(" ".join([str(a) for a in fi]))
+                f.write('\n')
 
 
 
