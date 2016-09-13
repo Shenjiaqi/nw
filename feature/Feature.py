@@ -66,16 +66,20 @@ class Feature:
                     user_rec[u][app_id]['norm_open_cnt'] = 0 if app_id_avg_open_sum < 1e-7 else \
                         user_rec[u][app_id]['avg_open_cnt'] / app_id_avg_open_sum
 
+        feature_list = []
         # print result
         for u in user_rec.keys():
             d = self.user_label.get_user(u)
-            print d['gender'], ' ', d['age_group'], ' ',
+            feature_i = [d['gender'], d['age_group']]
             for a in topk_appid_dict.keys():
                 if a in user_rec[u]:
-                    print user_rec[u][a]['norm_duration'], ' ', user_rec[u][a]['norm_open_cnt'], ' ',
+                    feature_i.append(user_rec[u][a]['norm_duration'])
+                    feature_i.append(user_rec[u][a]['norm_open_cnt'])
                 else:
-                    print 0.0, ' ', 0.0, ' ',
-            print ''
+                    feature_i.append(0.0)
+                    feature_i.append(0.0)
+            feature_list.append(feature_i)
+        return feature_list
 
 if __name__ == '__main__':
     with open('data.json', 'r') as f:

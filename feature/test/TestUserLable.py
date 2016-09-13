@@ -25,3 +25,6 @@ class TestUserLabel(unittest.TestCase):
         self.assertTrue('user2' in self.user_label.get_user_list())
         self.assertTrue('user3' in self.user_label.get_user_list())
         self.assertTrue('user4' in self.user_label.get_user_list())
+
+if __name__ == '__main__':
+    unittest.main()
