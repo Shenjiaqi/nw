@@ -1,6 +1,9 @@
 import json
 
 import datetime
+import os
+from os.path import join
+
 import AppUsage
 import UserLabel
 
@@ -97,10 +100,25 @@ if __name__ == '__main__':
         feature = Feature()
         feature.load_data(conf)
         feature_list = feature.generate_user_feature_by_topk_open_appid(conf['app_usage_topK'])
-        with open('user_appid_open_feature', 'w') as f:
-            for fi in feature_list:
-                f.write(" ".join([str(a) for a in fi]))
-                f.write('\n')
+        feature_dir = conf['feature_dir']
+        gender_files = []
+        for i in [1, 2]:
+            feature_path = join(feature_dir, 'gender', str(i))
+            if not os.path.exists(feature_path):
+                os.makedirs(feature_path)
+            gender_files.append(open(join(feature_path, 'feature'), 'w'))
+        age_files = []
+        for i in xrange(1, 7):
+            feature_path = join(feature_dir, 'age', str(i))
+            if not os.path.exists(feature_path):
+                os.makedirs(feature_path)
+            age_files.append(open(join(feature_path, 'feature'), 'w'))
+
+        # feature_list: [ gender age_group f1 f2 ... ]
+        for fi in feature_list:
+            f = ",".join([str(x) for x in fi[2:]])
+            gender_files[fi[0] - 1].write(f + '\n')
+            age_files[fi[1] - 1].write(f + '\n')
 
 
 
