@@ -1,13 +1,14 @@
 import json
 
-from feature import AppUsage
-from feature.UserLabel import UserLabel
+import datetime
+import AppUsage
+import UserLabel
 
 
 class Feature:
     def __init__(self):
-        self.app_usage = AppUsage()
-        self.user_label = UserLabel()
+        self.app_usage = AppUsage.AppUsage()
+        self.user_label = UserLabel.UserLabel()
 
     def load_data(self, conf):
         base_dir = conf['base_dir']
@@ -15,17 +16,25 @@ class Feature:
         self.user_label.load_data_from_base_dir(base_dir=base_dir)
 
     def generate_user_feature_by_topk_open_appid(self, k):
+        print "get topk start", datetime.datetime.now()
         topk_appid_dict = self.app_usage.get_topk_open_appid(k)
+        print "get topk end", datetime.datetime.now()
+
+        print "get user id list start", datetime.datetime.now()
         user_id_list = self.user_label.get_user_list()
+        print "get user id list end", datetime.datetime.now()
         user_id_dict = {}
         for u in user_id_list:
             user_id_dict[u] = None
+
+        print "extrace record start", datetime.datetime.now()
         rec = self.app_usage.extract_record(lambda user_id,
                                                    app_id,
                                                    count,
                                                    duration,
                                                    date: user_id in user_id_dict and
                                                          app_id in topk_appid_dict)
+        print "extrace record end", datetime.datetime.now()
         # {user_id: {app_id: {duration, day_sum, open_sum}}}
         user_rec = {}
         for k in rec:
@@ -51,6 +60,7 @@ class Feature:
                 user_rec[u][a]['avg_duration_time'] = float(user_rec[u][a]['duration']) / \
                                                       float(user_rec[u][a]['day_sum'])
 
+        print "len of user_rec", len(user_rec)
         # normalization
         for app_id in topk_appid_dict.keys():
             app_id_avg_open_sum = 0.0
