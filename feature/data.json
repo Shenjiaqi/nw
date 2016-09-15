@@ -1,5 +1,8 @@
 {
-  "base_dir": "/Users/sjq/Documents/nw/data/test/",
+  "base_dir": "/Users/sjq/Documents/nw/data/small/",
   "app_usage_topK": 100,
-  "feature_dir": "../tmp/test/user_appid_open_feature/"
+  "feature_dir": "../tmp/small/user_appid_open_feature/",
+  "origin_dataset_app_usage": "origin_contest_dataset_app_usage/",
+  "target_dataset_app_usage": "contest_dataset_app_usage/",
+  "hash_dataset_label_part_size": 80
 }

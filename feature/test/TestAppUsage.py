@@ -17,24 +17,27 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue('app3' in result.keys())
         self.assertTrue('app4' in result.keys())
 
+    def process_record(self, user_id, app_id, count, duration, date):
+        if user_id == 'user3' and app_id == 'app3':
+            self.rec.append({
+                'user_id': user_id,
+                'app_id': app_id,
+                'count': count,
+                'duration': duration,
+                'date': date
+            })
+
     def test_extract_record(self):
-        recs = self.app_usage.extract_record(lambda user_id,
-                                                    app_id,
-                                                    count,
-                                                    duration,
-                                                    date: user_id == 'user1' or app_id == 'app2')
-        self.assertEqual(3, len(recs))
-        recs = self.app_usage.extract_record(lambda user_id,
-                                                    app_id,
-                                                    count,
-                                                    duration,
-                                                    date: user_id == 'user3' and app_id == 'app3')
-        self.assertEqual(1, len(recs))
-        self.assertEqual('user3', recs[0]['user_id'])
-        self.assertEqual('app3', recs[0]['app_id'])
-        self.assertEqual(3, recs[0]['count'])
-        self.assertEqual(3, recs[0]['duration'])
-        self.assertEqual('2016-08-03', recs[0]['date'])
+        self.rec = []
+        self.app_usage.scan_record(self.process_record)
+        print self.rec
+        self.assertEqual(1, len(self.rec))
+        self.assertEqual('user3', self.rec[0]['user_id'])
+        self.assertEqual('app3', self.rec[0]['app_id'])
+        self.assertEqual(3, self.rec[0]['count'])
+        self.assertEqual(3, self.rec[0]['duration'])
+        self.assertEqual('2016-08-03', self.rec[0]['date'])
+
 
 if __name__ == '__main__':
     unittest.main()

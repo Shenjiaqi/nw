@@ -51,24 +51,16 @@ class AppUsage:
     def load_data_from_base_dir(self, base_dir):
         self.load_file(join(base_dir, "contest_dataset_app_usage"))
 
-    def extract_record(self, need_record):
-        result = []
+    def scan_record(self, process_record):
         for file in self.app_usage_data_files:
-            print
             with open(file, 'r') as f:
                 for line in f.readlines():
                     user_id, app_id, count, duration, time = line.split()
-                    if need_record(user_id=user_id,
+                    process_record(user_id=user_id,
                                    app_id=app_id,
-                                   count=count,
-                                   duration=duration,
-                                   date=time):
-                        result.append({'user_id': user_id,
-                                       'app_id': app_id,
-                                       'count': long(count),
-                                       'duration': long(duration),
-                                       'date': time})
-        return result
+                                   count=long(count),
+                                   duration=long(duration),
+                                   date=time)
 
 
 if __name__ == '__main__':
