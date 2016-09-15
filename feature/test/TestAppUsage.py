@@ -27,10 +27,15 @@ class TestStringMethods(unittest.TestCase):
                 'date': date
             })
 
+    def on_end_of_one_file(self, origin_file_name):
+        self.file_num += 1
+
     def test_extract_record(self):
         self.rec = []
-        self.app_usage.scan_record(self.process_record)
-        print self.rec
+        self.file_num = 0
+        self.app_usage.scan_record(self.process_record, self.on_end_of_one_file)
+
+        self.assertLess(0, self.file_num)
         self.assertEqual(1, len(self.rec))
         self.assertEqual('user3', self.rec[0]['user_id'])
         self.assertEqual('app3', self.rec[0]['app_id'])

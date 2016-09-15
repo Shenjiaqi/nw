@@ -1,5 +1,7 @@
 {
   "base_dir": "/Users/sjq/Documents/nw/data/test/",
+  "feature_dir": "user_appid_open_feature/",
+  "norm_feature_dir": "norm_user_appid_open_feature",
   "app_usage_topK": 2,
   "origin_dataset_app_usage": "origin_contest_dataset_app_usage/",
   "target_dataset_app_usage": "contest_dataset_app_usage/",

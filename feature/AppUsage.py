@@ -1,5 +1,6 @@
 import heapq
 import json
+import os
 
 from os import listdir
 
@@ -51,7 +52,7 @@ class AppUsage:
     def load_data_from_base_dir(self, base_dir):
         self.load_file(join(base_dir, "contest_dataset_app_usage"))
 
-    def scan_record(self, process_record):
+    def scan_record(self, process_record, on_end_of_one_file):
         for file in self.app_usage_data_files:
             with open(file, 'r') as f:
                 for line in f.readlines():
@@ -61,6 +62,7 @@ class AppUsage:
                                    count=long(count),
                                    duration=long(duration),
                                    date=time)
+                on_end_of_one_file(os.path.basename(file))
 
 
 if __name__ == '__main__':
