@@ -58,9 +58,9 @@ class Feature:
             user_info = self.user_label.get_user(user_id=user)
             user_gender = user_info['gender']
             user_age_group = user_info['age_group']
-            with open(join(gender_dir, str(user_gender)), 'a') as f:
+            with open(join(gender_dir, str(user_gender), 'feature'), 'a') as f:
                 f.write(','.join([str(i) for i in feature_line]) + '\n')
-            with open(join(age_dir, str(user_age_group)), 'a') as f:
+            with open(join(age_dir, str(user_age_group), 'feature'), 'a') as f:
                 f.write(','.join([str(i) for i in feature_line]) + '\n')
         self.rec = {}
 
@@ -92,23 +92,4 @@ if __name__ == '__main__':
         conf = json.load(f)
         feature = Feature(conf=conf)
         feature.load_data()
-        feature_list = feature.generate_user_feature_by_topk_open_appid(conf['app_usage_topK'])
-        feature_dir = conf['feature_dir']
-        gender_files = []
-        for i in [1, 2]:
-            feature_path = join(feature_dir, 'gender', str(i))
-            if not os.path.exists(feature_path):
-                os.makedirs(feature_path)
-            gender_files.append(open(join(feature_path, 'feature'), 'w'))
-        age_files = []
-        for i in xrange(1, 7):
-            feature_path = join(feature_dir, 'age', str(i))
-            if not os.path.exists(feature_path):
-                os.makedirs(feature_path)
-            age_files.append(open(join(feature_path, 'feature'), 'w'))
-
-        # feature_list: [ gender age_group f1 f2 ... ]
-        for fi in feature_list:
-            f = ",".join([str(x) for x in fi[2:]])
-            gender_files[fi[0] - 1].write(f + '\n')
-            age_files[fi[1] - 1].write(f + '\n')
+        feature.generate_user_feature_by_topk_open_appid(conf['app_usage_topK'])
