@@ -58,9 +58,9 @@ class Feature:
             user_info = self.user_label.get_user(user_id=user)
             user_gender = user_info['gender']
             user_age_group = user_info['age_group']
-            with open(join(gender_dir, str(user_gender)), 'w+') as f:
+            with open(join(gender_dir, str(user_gender)), 'a') as f:
                 f.write(','.join([str(i) for i in feature_line]) + '\n')
-            with open(join(age_dir, str(user_age_group)), 'w+') as f:
+            with open(join(age_dir, str(user_age_group)), 'a') as f:
                 f.write(','.join([str(i) for i in feature_line]) + '\n')
         self.rec = {}
 
