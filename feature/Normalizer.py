@@ -50,4 +50,5 @@ if __name__ == '__main__':
         base_dir = conf['base_dir']
         source_dir = join(base_dir, conf['feature_dir'])
         target_dir = join(base_dir, conf['norm_feature_dir'])
-        normalize.normalize(file_dir=source_dir, target_dir=target_dir)
+        normalize.normalize_age(file_dir=source_dir, target_dir=target_dir)
+        normalize.normalize_gender(file_dir=source_dir, target_dir=target_dir)
