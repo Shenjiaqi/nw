@@ -31,17 +31,18 @@ class Normalizer:
                             column_sum.append(0.0)
                         column_sum[c] += float(column)
                         c += 1
-        for file in os.listdir(file_dir):
-            file_path = join(file_dir, file)
-            with open(join(target_dir, file), 'w') as tf:
-                with open(file_path, 'r') as sf:
-                    for line in sf.readlines():
-                        target_line = []
-                        c = 0
-                        for column in line.split(','):
-                            target_line.append(0 if column_sum[c] < 1e-9 else float(column) / column_sum[c])
-                            c += 1
-                        tf.write(','.join([str(x) for x in target_line]) + '\n')
+        for category_dir in os.listdir(file_path):
+            for file in os.listdir(join(file_dir, category_dir)):
+                file_path = join(file_dir, category_dir, file)
+                with open(join(target_dir, category_dir, file), 'w') as tf:
+                    with open(file_path, 'r') as sf:
+                        for line in sf.readlines():
+                            target_line = []
+                            c = 0
+                            for column in line.split(','):
+                                target_line.append(0 if column_sum[c] < 1e-9 else float(column) / column_sum[c])
+                                c += 1
+                            tf.write(','.join([str(x) for x in target_line]) + '\n')
 
 if __name__ == '__main__':
     with open('data.json', 'r') as f:
