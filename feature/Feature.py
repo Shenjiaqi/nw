@@ -43,6 +43,15 @@ class Feature:
         for i in [gender_dir, age_dir]:
             if not os.path.exists(i):
                 os.makedirs(i)
+        for gender in xrange(1, 3):
+            gender_path = join(gender_dir, str(gender))
+            if not os.path.exists(gender_path):
+                os.makedirs(gender_path)
+        for age in xrange(1, 8):
+            age_path = join(age_dir, str(age))
+            if not os.path.exists(age_path):
+                os.makedirs(age_path)
+
         for user in self.rec:
             feature_line = []
             for app_id in self.topk_appid_dict:
