@@ -22,6 +22,9 @@ class HashDatasetAppUsage:
                     user_id, app_id, count, duration, date = l.split()
                     target_files[hash(user_id) % len(target_files)].write(l)
 
+        for i in target_files:
+            i.close()
+
 if __name__ == '__main__':
     with open('data.json', 'r') as f:
         conf = json.load(f)
