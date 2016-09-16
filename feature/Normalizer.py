@@ -21,20 +21,24 @@ class Normalizer:
         os.makedirs(target_dir)
 
         column_sum = []
-        for file in os.listdir(file_dir):
-            file_path = join(file_dir, file)
-            with open(file_path, 'r') as f:
-                for line in f.readlines():
-                    c = 0
-                    for column in line.split(','):
-                        if len(column_sum) <= c:
-                            column_sum.append(0.0)
-                        column_sum[c] += float(column)
-                        c += 1
-        for category_dir in os.listdir(file_path):
+        for category_dir in os.listdir(file_dir):
             for file in os.listdir(join(file_dir, category_dir)):
                 file_path = join(file_dir, category_dir, file)
-                with open(join(target_dir, category_dir, file), 'w') as tf:
+                with open(file_path, 'r') as f:
+                    for line in f.readlines():
+                        c = 0
+                        for column in line.split(','):
+                            if len(column_sum) <= c:
+                                column_sum.append(0.0)
+                            column_sum[c] += float(column)
+                            c += 1
+        for category_dir in os.listdir(file_dir):
+            for file in os.listdir(join(file_dir, category_dir)):
+                file_path = join(file_dir, category_dir, file)
+                target_category_dir = join(target_dir, category_dir)
+                if not os.path.exists(target_category_dir):
+                    os.makedirs(target_category_dir)
+                with open(join(target_category_dir, file), 'w') as tf:
                     with open(file_path, 'r') as sf:
                         for line in sf.readlines():
                             target_line = []
