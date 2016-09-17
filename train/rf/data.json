@@ -1,5 +1,5 @@
 {
-  "base_dir": "/Users/sjq/Documents/nw/data/test/",
+  "base_dir": "/home/mi/Desktop/nw/data/medium",
   "feature_dir": "user_appid_open_feature/",
   "model_dir": "user_appid_open_rf_model/",
   "norm_feature_dir": "norm_user_appid_open_feature",

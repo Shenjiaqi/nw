@@ -1,11 +1,14 @@
 import json
 import os
 from os.path import join
+import sys
+
+from train import FeatureLoader
+
+sys.path.append("..")
 
 import pickle
 from sklearn.ensemble import RandomForestClassifier
-
-from train import FeatureLoader
 
 
 class RFTrainer:
