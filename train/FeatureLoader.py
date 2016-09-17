@@ -28,4 +28,13 @@ class FeatureLoader:
                         tags.append(c)
         return records, tags
 
-
+    def scan_feature(self, feature_dir, category, handle_feature):
+        feature_folders = [f for f in sorted(listdir(join(feature_dir, category)))]
+        for f in feature_folders:
+            c = int(f)
+            class_dir = join(feature_dir, category, f)
+            for file in listdir(class_dir):
+                with open(join(class_dir, file), 'r') as f:
+                    for line in f.readlines():
+                        record = [float(x) for x in line.split(',')]
+                        handle_feature(c, record)
