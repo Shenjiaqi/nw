@@ -1,3 +1,7 @@
 {
-  "feature_dir": "../../tmp/test/user_appid_open_feature/"
+  "base_dir": "/Users/sjq/Documents/nw/data/test/",
+  "feature_dir": "user_appid_open_feature/",
+  "model_dir": "user_appid_open_rf_model/",
+  "norm_feature_dir": "norm_user_appid_open_feature",
+  "eval_dir": "user_appid_open_eval"
 }
