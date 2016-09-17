@@ -15,8 +15,8 @@ from sklearn.ensemble import RandomForestClassifier
 
 class RFTrainer:
     def __init__(self):
-        self.age_random_forest = RandomForestClassifier()
-        self.gender_random_forest = RandomForestClassifier()
+        self.age_random_forest = RandomForestClassifier(n_jobs=7)
+        self.gender_random_forest = RandomForestClassifier(n_jobs=7)
         self.feature_loader = FeatureLoader()
         self.age_feature = None
         self.gender_feature = None
