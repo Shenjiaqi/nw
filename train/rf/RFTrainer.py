@@ -1,12 +1,14 @@
 import json
 import os
 from os.path import join
+import sys
+sys.path.append("..")
 
 import pickle
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import datasets
 
-from train import FeatureLoader
+from FeatureLoader import FeatureLoader
 
 
 class RFTrainer:
@@ -15,7 +17,7 @@ class RFTrainer:
         self.gender_random_forest = RandomForestClassifier()
         self.age_feature = None
         self.gender_feature = None
-        self.feature_loader = FeatureLoader.FeatureLoader()
+        self.feature_loader = FeatureLoader()
 
     def load_feature(self, feature_dir):
         self.age_feature, self.age_target = \
