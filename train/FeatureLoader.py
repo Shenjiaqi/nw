@@ -29,7 +29,7 @@ class FeatureLoader:
             for file in listdir(class_dir):
                 with open(join(class_dir, file), 'r') as f:
                     for line in f.readlines():
-                        if random.randomint(0, 10) == 0:
+                        if random.randint(0, 10) == 0:
                             record = [float(x) for x in line.split(',')]
                             col_cnt = 0
                             for r in record:
