@@ -3,9 +3,9 @@ import os
 from os.path import join
 import sys
 
-from train import FeatureLoader
-
 sys.path.append("..")
+
+from FeatureLoader import FeatureLoader
 
 import pickle
 from sklearn.ensemble import RandomForestClassifier
