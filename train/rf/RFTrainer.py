@@ -67,10 +67,12 @@ all_cnt = 0
 def handler_feature(tag, feature):
     global zero_cnt
     global all_cnt
+    all_cnt += 1
     zero_cnt += 1
     for i in feature:
-        if i < 1e-10:
-            zero_cnt += 1
+        if i > 1e-8:
+            zero_cnt -= 1
+            break
 
 if __name__ == '__main__':
     with open('data.json', 'r') as f:
