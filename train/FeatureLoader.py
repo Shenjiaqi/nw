@@ -1,5 +1,7 @@
+import random
 from os import listdir
 from os.path import join
+
 from scipy.sparse import csr_matrix
 
 
@@ -27,17 +29,19 @@ class FeatureLoader:
             for file in listdir(class_dir):
                 with open(join(class_dir, file), 'r') as f:
                     for line in f.readlines():
-                        record = [float(x) for x in line.split(',')]
-                        col_cnt = 0
-                        for r in record:
-                            if r > 1e-8:
-                                value_arr.append(r)
-                                x_arr.append(row_cnt)
-                                y_arr.append(col_cnt)
-                            col_cnt += 1
-                            m_col_cnt = col_cnt
-                        tags.append(c)
-                        row_cnt += 1
+                        if random.randomint(0, 10) == 0:
+                            record = [float(x) for x in line.split(',')]
+                            col_cnt = 0
+                            for r in record:
+                                if r > 1e-8:
+                                    value_arr.append(r)
+                                    x_arr.append(row_cnt)
+                                    y_arr.append(col_cnt)
+                                col_cnt += 1
+                                m_col_cnt = col_cnt
+                            tags.append(c)
+                            row_cnt += 1
+                print len(value_arr), len(x_arr), len(y_arr)
         return csr_matrix((value_arr, (x_arr, y_arr)), shape=(len(tags), m_col_cnt)), tags
 
     def scan_feature(self, feature_dir, category, handle_feature):
