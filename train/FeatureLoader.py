@@ -1,6 +1,6 @@
 from os import listdir
 from os.path import join
-from sklearn import datasets
+from scipy.sparse import csr_matrix
 
 
 class FeatureLoader:
@@ -15,8 +15,12 @@ class FeatureLoader:
 
     def load_feature(self, feature_dir, category):
         feature_folders = [f for f in sorted(listdir(join(feature_dir, category)))]
-        records = []
         tags = []
+        row_cnt = 0
+        m_col_cnt = 0
+        value_arr = []
+        x_arr = []
+        y_arr = []
         for f in feature_folders:
             c = int(f)
             class_dir = join(feature_dir, category, f)
@@ -24,9 +28,17 @@ class FeatureLoader:
                 with open(join(class_dir, file), 'r') as f:
                     for line in f.readlines():
                         record = [float(x) for x in line.split(',')]
-                        records.append(record)
+                        col_cnt = 0
+                        for r in record:
+                            if r > 1e-8:
+                                value_arr.append(r)
+                                x_arr.append(row_cnt)
+                                y_arr.append(col_cnt)
+                            col_cnt += 1
+                            m_col_cnt = col_cnt
                         tags.append(c)
-        return records, tags
+                        row_cnt += 1
+        return csr_matrix((value_arr, (x_arr, y_arr)), shape=(len(tags), m_col_cnt)), tags
 
     def scan_feature(self, feature_dir, category, handle_feature):
         feature_folders = [f for f in sorted(listdir(join(feature_dir, category)))]
