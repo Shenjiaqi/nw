@@ -41,5 +41,7 @@ if __name__ == '__main__':
                                         jdx = j
                                 pred_sum += 1
                                 pred_cnt[jdx] += 1
+                                if pred_sum % 1000 == 0:
+                                    print ','.join([str(x / float(pred_sum)) for x in pred_cnt])
                             print t, c, file
                             print ','.join([str(x / float(pred_sum)) for x in pred_cnt])
