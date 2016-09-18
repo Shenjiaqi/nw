@@ -16,6 +16,7 @@ class FeatureLoader:
         return self.load_feature(feature_dir, 'gender')
 
     def load_feature(self, feature_dir, category):
+        print feature_dir, category
         feature_folders = [f for f in sorted(listdir(join(feature_dir, category)))]
         tags = []
         row_cnt = 0
@@ -28,7 +29,7 @@ class FeatureLoader:
             class_dir = join(feature_dir, category, f)
             for file in listdir(class_dir):
                 with open(join(class_dir, file), 'r') as f:
-                    for line in f.readlines():
+                    for line in f:
                         if random.randint(0, 10) == 0:
                             record = [float(x) for x in line.split(',')]
                             col_cnt = 0
@@ -51,6 +52,6 @@ class FeatureLoader:
             class_dir = join(feature_dir, category, f)
             for file in listdir(class_dir):
                 with open(join(class_dir, file), 'r') as f:
-                    for line in f.readlines():
+                    for line in f:
                         record = [float(x) for x in line.split(',')]
                         handle_feature(c, record)

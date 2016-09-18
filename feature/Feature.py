@@ -80,6 +80,8 @@ class Feature:
 
         print "get topk start", datetime.datetime.now()
         self.topk_appid_dict = self.app_usage.get_topk_open_appid(k)
+        with open('topk_appid_dict', 'w') as f:
+            f.write(str(self.topk_appid_dict))
         print "get topk end", datetime.datetime.now()
 
         print "get user id list start", datetime.datetime.now()

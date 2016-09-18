@@ -23,7 +23,7 @@ class UserLabel:
         files = [f for f in listdir(data_path) if isfile(join(data_path, f))]
         for f in files:
             with open(join(data_path, f)) as data_file:
-                for line in data_file.readlines():
+                for line in data_file:
                     user_id, gender, age_group = line.split()
                     self.add_user(user_id=user_id, gender=gender, age_group=age_group)
 

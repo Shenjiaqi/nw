@@ -25,7 +25,7 @@ class Normalizer:
             for file in os.listdir(join(file_dir, category_dir)):
                 file_path = join(file_dir, category_dir, file)
                 with open(file_path, 'r') as f:
-                    for line in f.readlines():
+                    for line in f:
                         c = 0
                         for column in line.split(','):
                             if len(column_sum) <= c:
@@ -40,7 +40,7 @@ class Normalizer:
                     os.makedirs(target_category_dir)
                 with open(join(target_category_dir, file), 'w') as tf:
                     with open(file_path, 'r') as sf:
-                        for line in sf.readlines():
+                        for line in sf:
                             target_line = []
                             c = 0
                             for column in line.split(','):

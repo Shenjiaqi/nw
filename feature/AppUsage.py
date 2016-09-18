@@ -41,7 +41,7 @@ class AppUsage:
             file_path = join(data_path, f);
             self.app_usage_data_files.append(file_path)
             with open(file_path) as data_file:
-                for line in data_file.readlines():
+                for line in data_file:
                     user_id, app_id, count, duration, time = line.split()
                     self.add_app_id_info(user_id=user_id,
                                          app_id=app_id,
@@ -55,7 +55,7 @@ class AppUsage:
     def scan_record(self, process_record, on_end_of_one_file):
         for file in self.app_usage_data_files:
             with open(file, 'r') as f:
-                for line in f.readlines():
+                for line in f:
                     user_id, app_id, count, duration, time = line.split()
                     process_record(user_id=user_id,
                                    app_id=app_id,
