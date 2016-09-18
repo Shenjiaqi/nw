@@ -30,10 +30,10 @@ class FeatureLoader:
                 with open(join(class_dir, file), 'r') as f:
                     for line in f.readlines():
                         if random.randint(0, 10) == 0:
-                            record = [float(x) for x in line.split(',')]
+                            record = [float(x) * 1e7 for x in line.split(',')]
                             col_cnt = 0
                             for r in record:
-                                if r > 1e-8:
+                                if r > 1e-13:
                                     value_arr.append(r)
                                     x_arr.append(row_cnt)
                                     y_arr.append(col_cnt)

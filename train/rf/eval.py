@@ -31,7 +31,7 @@ if __name__ == '__main__':
                             pred_sum = 0
                             for l in f.readlines():
                                 if random.randint(0, 10) == 0:
-                                    feature_line = [float(i) for i in l.split(',')]
+                                    feature_line = [float(i) * 1e7 for i in l.split(',')]
                                     if t == 'age':
                                         pred_result = rf_trainer.predict_age([feature_line])[0]
                                     else:

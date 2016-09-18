@@ -84,7 +84,6 @@ if __name__ == '__main__':
         rf_trainer.load_age_feature(feature_dir=feature_dir)
         print 'train age model'
         rf_trainer.train_age()
-        #rf_trainer.train_gender()
         print 'save age model'
         rf_trainer.save_age_model(model_dir)
 
