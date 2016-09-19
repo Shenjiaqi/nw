@@ -60,9 +60,14 @@ class FeatureLoader:
                         record = [float(x) for x in line.split(',')]
                         handle_feature(c, record)
 
-    def load_age_data_less_than_n(self, base_dir, n):
+    def load_data_less_than_n(self, base_dir, n, type):
         user_label = UserLabel()
-        user_list = user_label.load_age_data_less_than(base_dir, n)
+        user_list = {}
+        if type == 'gender':
+            user_list = user_label.load_gender_data_less_than(base_dir, n)
+        else:
+            assert type == 'age'
+            user_list = user_label.load_age_data_less_than(base_dir, n)
         user_id_idx = {}
         user_category = {}
         cnt = 0
@@ -105,8 +110,6 @@ class FeatureLoader:
                         app_time_sum[app_id] = 0.0
                     app_time_sum[app_id] += user_time_avg
 
-        print user_id_idx
-        print app_id_idx
         for file in os.listdir(feature_dir):
             with open(join(feature_dir, file), 'r') as f:
                 for line in f:

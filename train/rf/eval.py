@@ -14,7 +14,7 @@ if __name__ == '__main__':
         base_dir = conf['base_dir']
         model_dir = join(base_dir, conf['model_dir'])
         feature_loader = FeatureLoader()
-        feature_list = feature_loader.load_age_data_less_than_n(base_dir=base_dir, n=10000)
+        feature_list = feature_loader.load_data_less_than_n(base_dir=base_dir, n=10000)
         rf_trainer = RFTrainer()
         rf_trainer.load_model(model_dir=model_dir)
         for i in feature_list:

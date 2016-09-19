@@ -36,7 +36,7 @@ class UserLabel:
     def load_data_from_base_dir(self, base_dir):
         self.load_data(join(base_dir, 'contest_dataset_label'))
 
-    def load_age_data(self, data_dir):
+    def load_gender_data(self, data_dir):
         file_path = [join(data_dir, 'contest_dataset_label', f)
                      for f in listdir(join(data_dir, 'contest_dataset_label'))]
         user_dict = {}
@@ -51,8 +51,7 @@ class UserLabel:
                     user_dict[gender].append(user_id)
         return user_dict
 
-    def load_age_data_less_than(self, data_dir, n):
-        user_dict = self.load_age_data(data_dir=data_dir)
+    def filter_user_dict(self, user_dict, n):
         for i in user_dict.keys():
             l = len(user_dict[i])
             for j in xrange(0, l):
@@ -64,11 +63,30 @@ class UserLabel:
                 if j >= n:
                     user_dict[i] = user_dict[i][0:n]
                     break
+    def load_gender_data_less_than(self, data_dir, n):
+        user_dict = self.load_gender_data(data_dir=data_dir)
+        self.filter_user_dict(user_dict, n)
         return user_dict
 
-    # TODO load_gender_data
-    def load_gender_data(self):
-        pass
+    def load_age_data(self, data_dir):
+        file_path = [join(data_dir, 'contest_dataset_label', f)
+                     for f in listdir(join(data_dir, 'contest_dataset_label'))]
+        user_dict = {}
+        for file in file_path:
+            with open(file, 'r') as f:
+                for line in f:
+                    user_id, gender, age_group = line.strip().split()
+                    gender = int(gender)
+                    age_group = int(age_group)
+                    if age_group not in user_dict:
+                        user_dict[age_group] = []
+                    user_dict[age_group].append(user_id)
+        return user_dict
+
+    def load_age_data_less_than(self, data_dir, n):
+        user_dict = self.load_age_data(data_dir=data_dir)
+        self.filter_user_dict(user_dict, n)
+        return user_dict
 
 if __name__ == '__main__':
     user_label = UserLabel()

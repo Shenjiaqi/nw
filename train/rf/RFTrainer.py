@@ -22,13 +22,16 @@ class RFTrainer:
         self.gender_feature = None
 
     def load_age_feature(self, base_dir):
-        self.age_feature, self.age_target = self.feature_loader.load_age_data_less_than_n(self.base_dir, 1000000)
+        self.age_feature, self.age_target = self.feature_loader.load_data_less_than_n(self.base_dir, 1000000,
+                                                                                             'age')
         #self.age_feature, self.age_target = \
         #        self.feature_loader.load_age_feature(feature_dir=feature_dir)
 
     def load_gender_feature(self, feature_dir):
-        self.gender_feature, self.gender_target = \
-            self.feature_loader.load_gender_feature(feature_dir=feature_dir)
+        self.gender_feature, self.gender_target = self.feature_loader.load_data_less_than_n(self.base_dir, 1000000,
+                                                                                             'gender')
+        #self.gender_feature, self.gender_target = \
+            #self.feature_loader.load_gender_feature(feature_dir=feature_dir)
 
     def handle_age_feature(self):
         self.age_random_forest
@@ -90,7 +93,7 @@ if __name__ == '__main__':
         '''
         rf_trainer = RFTrainer()
         print 'load gender feature'
-        rf_trainer.load_gender_feature(feature_dir=feature_dir)
+        rf_trainer.load_gender_feature(base_dir=base_dir)
         print 'train gender feature'
         rf_trainer.train_gender()
         print 'save gender feature'
