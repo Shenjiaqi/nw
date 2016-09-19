@@ -15,20 +15,20 @@ from sklearn.ensemble import RandomForestClassifier
 
 class RFTrainer:
     def __init__(self):
-        self.age_random_forest = RandomForestClassifier(n_jobs=7)
-        self.gender_random_forest = RandomForestClassifier(n_jobs=7)
+        self.age_random_forest = RandomForestClassifier(n_jobs=10, n_estimators=100, min_samples_split=5, max_depth=10, min_samples_leaf=10)
+        self.gender_random_forest = RandomForestClassifier(n_jobs=10, n_estimators=100, min_samples_split=5, max_depth=10, min_samples_leaf=10)
         self.feature_loader = FeatureLoader()
         self.age_feature = None
         self.gender_feature = None
 
     def load_age_feature(self, base_dir):
-        self.age_feature, self.age_target = self.feature_loader.load_data_less_than_n(base_dir, 1000000,
+        self.age_feature, self.age_target = self.feature_loader.load_data_less_than_n(base_dir, 3000000,
                                                                                       'age')
         #self.age_feature, self.age_target = \
         #        self.feature_loader.load_age_feature(feature_dir=feature_dir)
 
-    def load_gender_feature(self, feature_dir):
-        self.gender_feature, self.gender_target = self.feature_loader.load_data_less_than_n(base_dir, 1000000,
+    def load_gender_feature(self, base_dir):
+        self.gender_feature, self.gender_target = self.feature_loader.load_data_less_than_n(base_dir, 3000000,
                                                                                             'gender')
         #self.gender_feature, self.gender_target = \
             #self.feature_loader.load_gender_feature(feature_dir=feature_dir)
@@ -45,8 +45,11 @@ class RFTrainer:
     def predict_age(self, feature):
         return self.age_random_forest.predict_proba(feature)
 
-    def predict_gender(self, feature):
+    def predict_gender_proba(self, feature):
         return self.gender_random_forest.predict_proba(feature)
+
+    def predict_gender(self, feature):
+        return self.gender_random_forest.predict(feature)
 
     def save_age_model(self, model_dir):
         if not os.path.exists(model_dir):
@@ -83,6 +86,7 @@ if __name__ == '__main__':
         feature_dir = join(base_dir, conf['norm_feature_dir'])
         model_dir = join(base_dir, conf['model_dir'])
 
+        '''
         rf_trainer = RFTrainer()
         print 'load age feature'
         rf_trainer.load_age_feature(base_dir=base_dir)
@@ -97,4 +101,4 @@ if __name__ == '__main__':
         print 'train gender feature'
         rf_trainer.train_gender()
         print 'save gender feature'
-        rf_trainer.save_gender_model(model_dir)'''
+        rf_trainer.save_gender_model(model_dir)

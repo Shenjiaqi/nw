@@ -73,12 +73,14 @@ class FeatureLoader:
         user_id_idx = {}
         user_category = {}
         cnt = 0
+        tag_list = []
         for i in user_list:
             for j in user_list[i]:
                 assert j not in user_id_idx
                 user_id_idx[j] = cnt
                 user_category[j] = i
                 cnt += 1
+                tag_list.append(i)
 
         app_usage = AppUsage()
         app_list = app_usage.load_app_id(base_dir)
@@ -93,7 +95,6 @@ class FeatureLoader:
         x_list = []
         y_list = []
         v_list = []
-        tag_list = []
 
         app_open_sum = {}
         app_time_sum = {}
@@ -126,12 +127,10 @@ class FeatureLoader:
                         time_sum = app_time_sum[app_id]
                         x_list.append(x)
                         y_list.append(y)
-                        v_list.append(user_open_avg / open_sum)
-                        tag_list.append(user_category[user_id])
+                        v_list.append(user_open_avg * 1e7 / open_sum)
 
                         x_list.append(x)
                         y_list.append(y + 1)
-                        v_list.append(user_time_avg / time_sum)
-                        tag_list.append(user_category[user_id])
+                        v_list.append(user_time_avg *1e7 / time_sum)
 
         return csr_matrix((v_list, (x_list, y_list)), shape=(len(tag_list), len(app_list) * 2)), tag_list

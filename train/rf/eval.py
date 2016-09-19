@@ -18,20 +18,21 @@ if __name__ == '__main__':
         rf_trainer.load_gender_model(model_dir=model_dir)
         print 'load feature'
         feature_loader = FeatureLoader()
-        feature_list = feature_loader.load_data_less_than_n(base_dir=base_dir, n=10000, type='gender')
-        for i in feature_list:
-            print 'begin eval', i
-            cnt = [0, 0]
-            pred = rf_trainer.predict_gender(feature_list)
-            for j in pred:
-                mk = 0
-                for k in len(pred[j]):
-                    if pred[j][mk] < pred[j][k]:
-                        mk = k
-                cnt[mk] += 1
-                if (cnt[0] + cnt[1] % 100) == 0:
-                    print i, cnt
-            print "#####", i, cnt
+        feature_list, tag_list = feature_loader.load_data_less_than_n(base_dir=base_dir, n=10000, type='gender')
+        print 'begin eval'
+        pred = rf_trainer.predict_gender(feature_list)
+        cnt = {}
+        for i in xrange(0, len(tag_list)):
+            print pred[i], tag_list[i]
+            tag = tag_list[i]
+            if tag not in cnt:
+                cnt[tag] = {}
+            if pred[i] not in cnt[tag]:
+                cnt[tag][pred[i]] = 0
+            cnt[tag][pred[i]] += 1
+            if i % 100 == 0:
+                print i, cnt
+        print "#####", i, cnt
         '''
         feature_dir = join(base_dir, conf['norm_feature_dir'])
         eval_dir = join(base_dir, conf['eval_dir'])
