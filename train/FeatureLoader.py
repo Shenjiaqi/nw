@@ -2,9 +2,11 @@ import os
 import random
 from os import listdir
 from os.path import join
+import sys
 
 from scipy.sparse import csr_matrix
 
+sys.path.append("../../")
 from feature import AppUsage
 from feature.UserLabel import UserLabel
 
