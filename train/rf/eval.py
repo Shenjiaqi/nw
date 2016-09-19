@@ -13,16 +13,16 @@ if __name__ == '__main__':
         conf = json.load(f)
         base_dir = conf['base_dir']
         model_dir = join(base_dir, conf['model_dir'])
-        print 'load feature'
-        feature_loader = FeatureLoader()
-        feature_list = feature_loader.load_data_less_than_n(base_dir=base_dir, n=10000)
         rf_trainer = RFTrainer()
         print 'load model'
-        rf_trainer.load_model(model_dir=model_dir)
+        rf_trainer.load_gender_model(model_dir=model_dir)
+        print 'load feature'
+        feature_loader = FeatureLoader()
+        feature_list = feature_loader.load_data_less_than_n(base_dir=base_dir, n=10000, type='gender')
         for i in feature_list:
             print 'begin eval', i
             cnt = [0, 0]
-            pred = rf_trainer.predict_age(feature_list[i])
+            pred = rf_trainer.predict_gender(feature_list[i])
             for j in pred:
                 mk = 0
                 for k in len(pred[j]):
