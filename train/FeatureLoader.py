@@ -2,9 +2,11 @@ import os
 import random
 from os import listdir
 from os.path import join
+import sys
 
 from scipy.sparse import csr_matrix
 
+sys.path.append("../../")
 from feature import AppUsage
 from feature.UserLabel import UserLabel
 
@@ -105,8 +107,6 @@ class FeatureLoader:
                         app_time_sum[app_id] = 0.0
                     app_time_sum[app_id] += user_time_avg
 
-        print user_id_idx
-        print app_id_idx
         for file in os.listdir(feature_dir):
             with open(join(feature_dir, file), 'r') as f:
                 for line in f:
