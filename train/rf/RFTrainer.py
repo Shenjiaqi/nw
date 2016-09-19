@@ -21,9 +21,10 @@ class RFTrainer:
         self.age_feature = None
         self.gender_feature = None
 
-    def load_age_feature(self, feature_dir):
-        self.age_feature, self.age_target = \
-            self.feature_loader.load_age_feature(feature_dir=feature_dir)
+    def load_age_feature(self, base_dir):
+        self.age_feature, self.age_target = self.feature_loader.load_age_data_less_than_n(self.base_dir, 1000000)
+        #self.age_feature, self.age_target = \
+        #        self.feature_loader.load_age_feature(feature_dir=feature_dir)
 
     def load_gender_feature(self, feature_dir):
         self.gender_feature, self.gender_target = \
@@ -81,16 +82,16 @@ if __name__ == '__main__':
 
         rf_trainer = RFTrainer()
         print 'load age feature'
-        rf_trainer.load_age_feature(feature_dir=feature_dir)
+        rf_trainer.load_age_feature(base_dir=base_dir)
         print 'train age model'
         rf_trainer.train_age()
         print 'save age model'
         rf_trainer.save_age_model(model_dir)
-
+        '''
         rf_trainer = RFTrainer()
         print 'load gender feature'
         rf_trainer.load_gender_feature(feature_dir=feature_dir)
         print 'train gender feature'
         rf_trainer.train_gender()
         print 'save gender feature'
-        rf_trainer.save_gender_model(model_dir)
+        rf_trainer.save_gender_model(model_dir)'''

@@ -65,6 +65,15 @@ class AppUsage:
                 on_end_of_one_file(os.path.basename(file))
 
 
+    def load_app_id(self, base_dir):
+        app_id_dir = join(base_dir, 'app_id')
+        app_id_list = []
+        for file_name in listdir(app_id_dir):
+            with open(join(app_id_dir, file_name), 'r') as f:
+                for l in f:
+                    app_id_list.append(l.strip())
+        return app_id_list
+
 if __name__ == '__main__':
     app_usage = AppUsage()
     with open("data.json", 'r') as f:

@@ -98,6 +98,7 @@ class Feature:
         print "extrace record end", datetime.datetime.now()
         # {user_id: {app_id: {duration, day_sum, open_sum}}}
 
+
 if __name__ == '__main__':
     with open('data.json', 'r') as f:
         conf = json.load(f)

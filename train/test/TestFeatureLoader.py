@@ -6,9 +6,10 @@ from train import FeatureLoader
 
 class TestFeatureLoader(unittest.TestCase):
     def setUp(self):
-        self.feature_loader = FeatureLoader.FeatureLoader()
+        self.feature_loader = FeatureLoader()
         with open('data.json', 'r') as f:
             self.conf = json.load(f)
+            self.base_dir = self.conf['base_dir']
 
     def test_load_age_feature(self):
         feature, classes = self.feature_loader.load_age_feature(self.conf['feature_dir'])
@@ -23,6 +24,14 @@ class TestFeatureLoader(unittest.TestCase):
         self.assertEqual(1, len(feature[0]))
         for i in xrange(len(feature)):
             self.assertEqual(feature[i][0], classes[i])
+
+    def test_load_age_data(self):
+        m, t = self.feature_loader.load_age_data_less_than_n(self.base_dir, 2)
+
+        print m, t
+        m2, t2 = self.feature_loader.load_age_data_less_than_n(self.base_dir, 1)
+        print m2, t2
+
 
 if __name__ == '__main__':
     unittest.main()

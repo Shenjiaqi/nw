@@ -9,7 +9,8 @@ class TestStringMethods(unittest.TestCase):
         self.app_usage = AppUsage()
         with open('data.json', 'r') as f:
             conf = json.load(f)
-            self.app_usage.load_data_from_base_dir(conf['base_dir'])
+            self.base_dir = conf['base_dir']
+            self.app_usage.load_data_from_base_dir(self.base_dir)
 
     def test_get_topk_open_appid(self):
         result = self.app_usage.get_topk_open_appid(2)
@@ -43,6 +44,12 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(3, self.rec[0]['duration'])
         self.assertEqual('2016-08-03', self.rec[0]['date'])
 
+    def test_load_app_id(self):
+        app_id_list = self.app_usage.load_app_id(self.base_dir)
+        self.assertEqual(4, len(app_id_list))
+        print app_id_list
+        for i in xrange(1, 5):
+            self.assertTrue('app' + str(i) in app_id_list)
 
 if __name__ == '__main__':
     unittest.main()
