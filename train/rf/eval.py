@@ -22,7 +22,7 @@ if __name__ == '__main__':
         for i in feature_list:
             print 'begin eval', i
             cnt = [0, 0]
-            pred = rf_trainer.predict_gender(feature_list[i])
+            pred = rf_trainer.predict_gender(feature_list)
             for j in pred:
                 mk = 0
                 for k in len(pred[j]):
