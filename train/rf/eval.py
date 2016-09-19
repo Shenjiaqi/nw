@@ -22,11 +22,11 @@ if __name__ == '__main__':
         for i in feature_list:
             print 'begin eval', i
             cnt = [0, 0]
-            for j in feature_list[i]:
-                pred = rf_trainer.predict_age(j)
+            pred = rf_trainer.predict_age(feature_list[i])
+            for j in pred:
                 mk = 0
-                for k in len(pred):
-                    if pred[mk] < pred[k]:
+                for k in len(pred[j]):
+                    if pred[j][mk] < pred[j][k]:
                         mk = k
                 cnt[mk] += 1
                 if (cnt[0] + cnt[1] % 100) == 0:
