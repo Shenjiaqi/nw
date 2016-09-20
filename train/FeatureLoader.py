@@ -1,5 +1,6 @@
 import os
 import random
+from multiprocessing.pool import ThreadPool
 from os import listdir
 from os.path import join
 import sys
@@ -62,7 +63,24 @@ class FeatureLoader:
                         record = [float(x) for x in line.split(',')]
                         handle_feature(c, record)
 
-    def load_data_less_than_n(self, base_dir, n, type):
+    def cal_app_use_sum(self, file):
+        open_sum = {}
+        time_sum = {}
+        with open(file, 'r') as f:
+            for line in f:
+                user_id, app_id, user_open_avg, user_time_avg = line.strip().split()
+                user_open_avg = float(user_open_avg)
+                user_time_avg = float(user_time_avg)
+                if app_id not in open_sum:
+                    open_sum[app_id] = 0.0
+                open_sum[app_id] += user_open_avg
+
+                if app_id not in time_sum:
+                    time_sum[app_id] = 0.0
+                time_sum[app_id] += user_time_avg
+
+
+    def load_data_less_than_n(self, base_dir, feature_dir, n, type):
         user_label = UserLabel()
         user_list = {}
         if type == 'gender':
@@ -91,46 +109,49 @@ class FeatureLoader:
             app_id_idx[i] = cnt
             cnt += 1
 
-        feature_dir = join(base_dir, 'user_app_usage_feature_top100')
+        feature_dir = join(base_dir, feature_dir)
         x_list = []
         y_list = []
         v_list = []
 
         app_open_sum = {}
         app_time_sum = {}
+        file_list = []
         for file in os.listdir(feature_dir):
-            with open(join(feature_dir, file), 'r') as f:
+            file_list.append(join(feature_dir, file))
+
+        app_id_list = []
+        for file in file_list:
+            with open(file, 'r') as f:
                 for line in f:
                     user_id, app_id, user_open_avg, user_time_avg = line.strip().split()
                     user_open_avg = float(user_open_avg)
                     user_time_avg = float(user_time_avg)
-                    assert app_id in app_id_idx
+
                     if app_id not in app_open_sum:
                         app_open_sum[app_id] = 0.0
-                    app_open_sum[app_id] += user_open_avg
-
                     if app_id not in app_time_sum:
                         app_time_sum[app_id] = 0.0
+                    app_open_sum[app_id] += user_open_avg
                     app_time_sum[app_id] += user_time_avg
 
-        for file in os.listdir(feature_dir):
-            with open(join(feature_dir, file), 'r') as f:
-                for line in f:
-                    user_id, app_id, user_open_avg, user_time_avg = line.strip().split()
-                    user_open_avg = float(user_open_avg)
-                    user_time_avg = float(user_time_avg)
                     if user_id in user_category:
                         x = user_id_idx[user_id]
                         y = app_id_idx[app_id] * 2
 
-                        open_sum = app_open_sum[app_id]
-                        time_sum = app_time_sum[app_id]
                         x_list.append(x)
                         y_list.append(y)
-                        v_list.append(user_open_avg * 1e7 / open_sum)
-
+                        v_list.append(user_open_avg)
+                        app_id_list.append(app_id)
                         x_list.append(x)
                         y_list.append(y + 1)
-                        v_list.append(user_time_avg *1e7 / time_sum)
+                        v_list.append(user_time_avg)
+                        app_id_list.append(app_id)
+
+        i = 0
+        while i < len(app_id_list):
+            v_list[i] /= app_open_sum[app_id_list[i]]
+            v_list[i + 1] /= app_time_sum[app_id_list[i + 1]]
+            i += 2
 
         return csr_matrix((v_list, (x_list, y_list)), shape=(len(tag_list), len(app_list) * 2)), tag_list

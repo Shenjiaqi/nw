@@ -1,6 +1,6 @@
 {
-  "base_dir": "/home/mi/Desktop/nw/data/medium",
-  "feature_dir": "user_appid_open_feature/",
+  "base_dir": "/Users/sjq/Documents/nw/data/mock",
+  "feature_dir": "user_app_usage_feature_top100",
   "model_dir": "user_appid_open_rf_model/",
   "norm_feature_dir": "norm_user_appid_open_feature",
   "eval_dir": "user_appid_open_eval"

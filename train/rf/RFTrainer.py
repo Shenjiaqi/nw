@@ -83,13 +83,13 @@ if __name__ == '__main__':
     with open('data.json', 'r') as f:
         conf = json.load(f)
         base_dir = conf['base_dir']
-        feature_dir = join(base_dir, conf['norm_feature_dir'])
+        feature_dir = join(base_dir, conf['feature_dir'])
         model_dir = join(base_dir, conf['model_dir'])
 
         '''
         rf_trainer = RFTrainer()
         print 'load age feature'
-        rf_trainer.load_age_feature(base_dir=base_dir)
+        rf_trainer.load_age_feature(base_dir=base_dir, feature_dir=feature_dir)
         print 'train age model'
         rf_trainer.train_age()
         print 'save age model'
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         '''
         rf_trainer = RFTrainer()
         print 'load gender feature'
-        rf_trainer.load_gender_feature(base_dir=base_dir)
+        rf_trainer.load_gender_feature(base_dir=base_dir, feature_dir=feature_dir)
         print 'train gender feature'
         rf_trainer.train_gender()
         print 'save gender feature'
