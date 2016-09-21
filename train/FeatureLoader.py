@@ -121,9 +121,11 @@ class FeatureLoader:
             file_list.append(join(feature_dir, file))
 
         app_id_list = []
-        tag_list = [0 for i in xrange(0, len(user_category))]
+        user_tag_list = [0 for i in xrange(0, len(user_category))]
 
+        user_meet = {}
         for file in file_list:
+            print file
             with open(file, 'r') as f:
                 for line in f:
                     user_id, app_id, user_open_avg, user_time_avg, gender, age, app_open_time, app_use_time = line.strip().split()
@@ -138,7 +140,9 @@ class FeatureLoader:
                     app_time_sum[app_id] += user_time_avg
 
                     if user_id in user_category:
-                        tag_list[user_id_idx[user_id]] = user_category[user_id]
+                        user_tag_list[user_id_idx[user_id]] = user_category[user_id]
+
+                        user_meet[user_id] = 1
 
                         x = user_id_idx[user_id]
                         y = app_id_idx[app_id] * 2
@@ -152,10 +156,19 @@ class FeatureLoader:
                         v_list.append(user_time_avg)
                         app_id_list.append(app_id)
 
+        for i in user_id_idx.keys():
+            if i not in user_meet:
+                idx = user_id_idx[i]
+                assert user_tag_list[idx] == 0
+                user_tag_list[idx] = user_category[i]
+
+        for i in user_tag_list:
+            assert i != 0
+
         i = 0
         while i < len(app_id_list):
             v_list[i] /= app_open_sum[app_id_list[i]]
             v_list[i + 1] /= app_time_sum[app_id_list[i + 1]]
             i += 2
 
-        return csr_matrix((v_list, (x_list, y_list)), shape=(len(tag_list), len(app_list) * 2)), tag_list
+        return csr_matrix((v_list, (x_list, y_list)), shape=(len(user_tag_list), len(app_list) * 2)), user_tag_list
