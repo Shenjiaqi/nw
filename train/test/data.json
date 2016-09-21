@@ -1,3 +1,4 @@
 {
-  "feature_dir": "../../data/test/"
+  "base_dir": "/Users/sjq/Documents/nw/data/test/",
+  "feature_dir": "user_app_usage_feature_top100"
 }

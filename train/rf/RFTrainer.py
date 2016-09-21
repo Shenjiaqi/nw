@@ -21,14 +21,14 @@ class RFTrainer:
         self.age_feature = None
         self.gender_feature = None
 
-    def load_age_feature(self, base_dir):
-        self.age_feature, self.age_target = self.feature_loader.load_data_less_than_n(base_dir, 3000000,
+    def load_age_feature(self, base_dir, feature_dir):
+        self.age_feature, self.age_target = self.feature_loader.load_data_less_than_n(base_dir, feature_dir, 3000000,
                                                                                       'age')
         #self.age_feature, self.age_target = \
         #        self.feature_loader.load_age_feature(feature_dir=feature_dir)
 
-    def load_gender_feature(self, base_dir):
-        self.gender_feature, self.gender_target = self.feature_loader.load_data_less_than_n(base_dir, 3000000,
+    def load_gender_feature(self, base_dir, feature_dir):
+        self.gender_feature, self.gender_target = self.feature_loader.load_data_less_than_n(base_dir, feature_dir, 3000000,
                                                                                             'gender')
         #self.gender_feature, self.gender_target = \
             #self.feature_loader.load_gender_feature(feature_dir=feature_dir)
@@ -102,3 +102,9 @@ if __name__ == '__main__':
         rf_trainer.train_gender()
         print 'save gender feature'
         rf_trainer.save_gender_model(model_dir)
+
+        feature_loader = FeatureLoader()
+        f, t = feature_loader.load_data_less_than_n(base_dir, feature_dir, 1000, 'gender')
+        pred_result = rf_trainer.predict_gender_proba(f)
+        for i in xrange(0, len(t)):
+            print pred_result[i], t[i]

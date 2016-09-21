@@ -23,8 +23,8 @@ class FeatureLoader:
         return self.load_feature(feature_dir, 'gender')
 
     def load_feature(self, feature_dir, category):
-        print feature_dir, category
         feature_folders = [f for f in sorted(listdir(join(feature_dir, category)))]
+        print "#####", feature_folders
         tags = []
         row_cnt = 0
         m_col_cnt = 0
@@ -82,6 +82,7 @@ class FeatureLoader:
 
     def load_data_less_than_n(self, base_dir, feature_dir, n, type):
         user_label = UserLabel()
+
         user_list = {}
         if type == 'gender':
             user_list = user_label.load_gender_data_less_than(base_dir, n)
@@ -91,22 +92,21 @@ class FeatureLoader:
         user_id_idx = {}
         user_category = {}
         cnt = 0
-        tag_list = []
         for i in user_list:
             for j in user_list[i]:
                 assert j not in user_id_idx
                 user_id_idx[j] = cnt
                 user_category[j] = i
                 cnt += 1
-                tag_list.append(i)
 
         app_usage = AppUsage()
         app_list = app_usage.load_app_id(base_dir)
         cnt = 0
         app_id_idx = {}
         for i in app_list:
-            assert i not in app_id_idx
-            app_id_idx[i] = cnt
+            app_id = i.strip().split()[0]
+            assert app_id not in app_id_idx
+            app_id_idx[app_id] = cnt
             cnt += 1
 
         feature_dir = join(base_dir, feature_dir)
@@ -121,10 +121,12 @@ class FeatureLoader:
             file_list.append(join(feature_dir, file))
 
         app_id_list = []
+        tag_list = [0 for i in xrange(0, len(user_category))]
+
         for file in file_list:
             with open(file, 'r') as f:
                 for line in f:
-                    user_id, app_id, user_open_avg, user_time_avg = line.strip().split()
+                    user_id, app_id, user_open_avg, user_time_avg, gender, age, app_open_time, app_use_time = line.strip().split()
                     user_open_avg = float(user_open_avg)
                     user_time_avg = float(user_time_avg)
 
@@ -136,6 +138,8 @@ class FeatureLoader:
                     app_time_sum[app_id] += user_time_avg
 
                     if user_id in user_category:
+                        tag_list[user_id_idx[user_id]] = user_category[user_id]
+
                         x = user_id_idx[user_id]
                         y = app_id_idx[app_id] * 2
 

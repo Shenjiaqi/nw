@@ -1,5 +1,5 @@
 {
-  "base_dir": "/Users/sjq/Documents/nw/data/small/",
+  "base_dir": "/Users/sjq/Documents/nw/data/mock/",
   "app_usage_topK": 100,
   "feature_dir": "user_appid_open_feature/",
   "norm_feature_dir": "norm_user_appid_open_feature",

@@ -39,6 +39,7 @@ class UserLabel:
     def load_gender_data(self, data_dir):
         file_path = [join(data_dir, 'contest_dataset_label', f)
                      for f in listdir(join(data_dir, 'contest_dataset_label'))]
+        print file_path
         user_dict = {}
         for file in file_path:
             with open(file, 'r') as f:
