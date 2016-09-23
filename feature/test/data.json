@@ -1,5 +1,10 @@
 {
   "base_dir": "/Users/sjq/Documents/nw/data/test/",
+  "uv_dir": "uv_top100",
+  "usage_top100_appid": "usage_top100_appid",
+  "install_top100_appid": "install_top100_appid",
+  "query_top100": "query_top100",
+  "url_top100": "url_top100",
   "feature_dir": "user_appid_open_feature/",
   "norm_feature_dir": "norm_user_appid_open_feature",
   "app_usage_topK": 2,
