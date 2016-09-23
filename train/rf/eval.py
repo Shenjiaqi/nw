@@ -12,26 +12,24 @@ if __name__ == '__main__':
     with open('data.json', 'r') as f:
         conf = json.load(f)
         base_dir = conf['base_dir']
+        feature_dir = conf['feature_dir']
         model_dir = join(base_dir, conf['model_dir'])
         rf_trainer = RFTrainer()
         print 'load model'
         rf_trainer.load_gender_model(model_dir=model_dir)
         print 'load feature'
         feature_loader = FeatureLoader()
-        feature_list, tag_list = feature_loader.load_data_less_than_n(base_dir=base_dir, n=10000, type='gender')
+        feature_list, tag_list = feature_loader.load_data_less_than_n(base_dir=base_dir, feature_dir=feature_dir, n=10000, type='gender')
         print 'begin eval'
         pred = rf_trainer.predict_gender(feature_list)
         cnt = {}
         for i in xrange(0, len(tag_list)):
-            print pred[i], tag_list[i]
             tag = tag_list[i]
             if tag not in cnt:
                 cnt[tag] = {}
             if pred[i] not in cnt[tag]:
                 cnt[tag][pred[i]] = 0
             cnt[tag][pred[i]] += 1
-            if i % 100 == 0:
-                print i, cnt
         print "#####", i, cnt
         '''
         feature_dir = join(base_dir, conf['norm_feature_dir'])
