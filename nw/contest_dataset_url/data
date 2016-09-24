@@ -1,6 +1,7 @@
-user1 url1 1
-user1 url1 1
-user2 url1 1
-user2 url2 1
-user3 url2 2
-user3 url1 3
+user1 url1 2013-01-30
+user2 url1 2012-02-28
+user2 url2 2011-01-02
+user3 url2 2011-01-02
+user4 url2 2011-01-01
+user3 url1 2012-01-01
+user1 url1 2013-01-30
