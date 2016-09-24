@@ -17,12 +17,12 @@ class AppUsage:
 
     def add_app_id_info(self, user_id, app_id, count, duration, date):
         if app_id not in self.app_usage_data:
-            self.app_usage_data[app_id] = {'open_sum': 0L,
-                                           'duration_sum': 0L,
-                                           'day_sum': 0L}
-        self.app_usage_data[app_id]['open_sum'] += long(count)
-        self.app_usage_data[app_id]['duration_sum'] += long(duration)
-        self.app_usage_data[app_id]['day_sum'] += 1
+            self.app_usage_data[app_id] = {'open_sum': 0.0,
+                                           'duration_sum': 0.0,
+                                           'day_sum': 0.0}
+        self.app_usage_data[app_id]['open_sum'] += count
+        self.app_usage_data[app_id]['duration_sum'] += duration
+        self.app_usage_data[app_id]['day_sum'] += 1.0
 
     def get_topk_open_appid(self, k):
         # {app_id: {open_sum, duration_sum, day_sum}}
@@ -50,7 +50,7 @@ class AppUsage:
                                          date=time)
 
     def load_data_from_base_dir(self, base_dir):
-        self.load_file(join(base_dir, "contest_dataset_app_usage"))
+        self.load_file(base_dir)
 
     def scan_record(self, process_record, on_end_of_one_file):
         for file in self.app_usage_data_files:

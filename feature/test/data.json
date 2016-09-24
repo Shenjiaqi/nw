@@ -5,6 +5,21 @@
   "install_top100_appid": "install_top100_appid",
   "query_top100": "query_top100",
   "url_top100": "url_top100",
+  "user_label": "contest_dataset_label",
+  "gender_train_size_each_category": 1,
+  "age_train_size_each_category": 1,
+
+  "output_feature_base": "/Users/sjq/Documents/nw/data/test/output/feature/",
+  "gender_train_output_feature_dir": "train/gender/",
+  "gender_eval_output_feature_dir": "eval/gender/",
+  "gender_submit_output_feature_dir": "submit/gender/",
+  "age_train_output_feature_dir": "train/age/",
+  "age_eval_output_feature_dir": "eval/age/",
+  "age_submit_output_feature_dir": "submit/age/",
+
+  "contest_dataset_app_usage": "contest_dataset_app_usage",
+  "age_output_feature_dir":"/Users/sjq/Documents/nw/data/test/output/feature/age/",
+
   "feature_dir": "user_appid_open_feature/",
   "norm_feature_dir": "norm_user_appid_open_feature",
   "app_usage_topK": 2,

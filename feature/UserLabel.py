@@ -9,6 +9,7 @@ from os.path import isfile
 class UserLabel:
     def __init__(self):
         self.user_info = {}
+        self.user_counter = 0
 
     def add_user(self, user_id, gender, age_group):
         if user_id in self.user_info:
@@ -16,6 +17,7 @@ class UserLabel:
         else:
             self.user_info[user_id] = {"gender": int(gender),
                                        "age_group": int(age_group)}
+            self.user_counter += 1
 
     def get_user_list(self):
         return self.user_info.keys()
@@ -25,7 +27,7 @@ class UserLabel:
         for f in files:
             with open(join(data_path, f)) as data_file:
                 for line in data_file:
-                    user_id, gender, age_group = line.split()
+                    user_id, gender, age_group = line.strip().split()
                     self.add_user(user_id=user_id, gender=gender, age_group=age_group)
 
     def get_user(self, user_id):
@@ -33,8 +35,14 @@ class UserLabel:
             return self.user_info[user_id]
         return None
 
+    def get_user_age(self, user_id):
+        return self.user_info[user_id]['age_group']
+
+    def get_user_gender(self, user_id):
+        return self.user_info[user_id]['gender']
+
     def load_data_from_base_dir(self, base_dir):
-        self.load_data(join(base_dir, 'contest_dataset_label'))
+        self.load_data(base_dir)
 
     def load_gender_data(self, data_dir):
         file_path = [join(data_dir, 'contest_dataset_label', f)
