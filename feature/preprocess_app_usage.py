@@ -6,22 +6,18 @@ if __name__ == '__main__':
 
     with open("data.json", "r") as f:
         conf = json.load(f)
-        device_dir = join(conf['base_dir'], conf['contest_dataset_device_info'])
-        device_dir_out = join(conf['uv_dir'], 'device_info')
-        brand_dict = {}
-        brand_cnt = 0
-        model_dict = {}
-        model_cnt = 0
+        device_dir = join(conf['base_dir'], conf['reduced_app_usage'])
+        device_dir_out = join(conf['uv_dir'], 'app_usage')
+        app_id_dict = {}
+        app_id_cnt = 0
         with open(device_dir_out, 'w') as out_f:
             for i in os.listdir(device_dir):
                 with open(join(device_dir, i), 'r') as f:
                     for line in f:
-                        user_id, brand, model = line.strip().split()
-                        if brand not in brand_dict:
-                            brand_dict[brand] = brand_cnt
-                            brand_cnt += 1
-                        if model not in model_dict:
-                            model_dict[model] = model_cnt
-                            model_cnt += 1
-                        out_f.write('\t'.join([user_id, 'brand', str(brand_dict[brand])]) + '\n')
-                        out_f.write('\t'.join([user_id, 'model', str(model_dict[model])]) + '\n')
+                        user_id, app_id, count, duration = line.strip().split()
+                        if app_id not in app_id_dict:
+                            app_id_dict[app_id] = app_id_cnt
+                            app_id_cnt += 1
+                        app_id_idx = app_id_dict[app_id]
+                        out_f.write('\t'.join([user_id, 'ac' + app_id_idx, count]) + '\n')
+                        out_f.write('\t'.join([user_id, 'ad' + app_id_idx, duration]) + '\n')
