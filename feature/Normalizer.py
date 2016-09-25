@@ -65,7 +65,7 @@ if __name__ == '__main__':
         feature_id_map_size = 0
         device_id_map = {}
         device_id_map_size = 0
-        all_raw_feature = zeros((7634428 + 3804980, 450), dtype=numpy.float64)
+        all_raw_feature = zeros((12439410, 490), dtype=numpy.float64)
         dev_raw_feature = zeros((all_raw_feature.shape[0], 2), numpy.float64)
         for i in os.listdir(reduced_feature_dir):
             if i.startswith('device_'):
