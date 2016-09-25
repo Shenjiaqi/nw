@@ -143,22 +143,14 @@ def get_max_day(day_1, day_2):
    
 def get_key_from_line(line):
     user_id, app_id, count, duration, time = line.strip().split()
-    if app_id in uv_top_app_id:
-        return '\t'.join([user_id, app_id]), (float(count), float(duration), time, time)
-    return None
+    return '\t'.join([user_id, app_id]), (float(count), float(duration), time, time)
 
 def reduce_record(rec_a, rec_b):
-    if rec_a == None:
-        return rec_b
-    if rec_b == None:
-        return rec_a
     count_a, duration_a, time_min_a, time_max_a = rec_a
     count_b, duration_b, time_min_b, time_max_b = rec_b
     return count_a + count_b, duration_a + duration_b, get_min_day(time_min_a, time_min_b), get_max_day(time_max_a, time_max_b)
 
 def get_avg_uv(line):
-    if line == None:
-        return
     user_id, app_id = line[0].split()
     count = line[1][0]
     duration = line[1][1]
@@ -175,6 +167,7 @@ if __name__ == "__main__":
     lines = sc.textFile(sys.argv[1])
     # user_id, app_id, count, duration, time
     res = lines.map(get_key_from_line)\
+        .filter(lambda x: x[0].split()[1] in uv_top_app_id)\
         .reduceByKey(reduce_record)\
         .map(get_avg_uv)
     res.saveAsTextFile(sys.argv[2])
