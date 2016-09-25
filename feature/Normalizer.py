@@ -52,18 +52,37 @@ class Normalizer:
                                 c += 1
                             tf.write(','.join([str(x) for x in target_line]) + '\n')
 
+
 if __name__ == '__main__':
     with open('data.json', 'r') as f:
         conf = json.load(f)
         base_dir = conf['base_dir']
         reduced_feature_dir = conf['reduced_dir']
-        feature_output_dir = conf['output_feature_base']
+        feature_output_dir = conf['output_feature_dir']
         user_id_map = {}
         user_id_map_size = 0
         feature_id_map = {}
         feature_id_map_size = 0
-        all_raw_feature = zeros((7634428+3804980, 450), dtype=numpy.float64)
+        device_id_map = {}
+        device_id_map_size = 0
+        all_raw_feature = zeros((7634428 + 3804980, 450), dtype=numpy.float64)
+        dev_raw_feature = zeros((all_raw_feature.shape[0], 2), numpy.float64)
         for i in os.listdir(reduced_feature_dir):
+            if i.startswith('device_'):
+                # device info do not need to be normalized
+                with open(join(reduced_feature_dir, i), 'r') as in_f:
+                    for line in in_f:
+                        user_id, dev_feature_id, value = line.split()
+                        if user_id not in user_id_map:
+                            user_id_map[user_id] = user_id_map_size
+                            user_id_map_size += 1
+                        if dev_feature_id not in device_id_map:
+                            device_id_map[dev_feature_id] = device_id_map_size
+                            device_id_map_size += 1
+                        user_id_idx = user_id_map[user_id]
+                        dev_id_idx = device_id_map[dev_feature_id]
+                        dev_raw_feature[user_id_idx][dev_id_idx] = float(value)
+                continue
             with open(join(reduced_feature_dir, i), 'r') as in_f:
                 for line in in_f:
                     user_id, feature_id, value = line.strip().split()
@@ -78,7 +97,9 @@ if __name__ == '__main__':
                     all_raw_feature[user_id_idx][feature_id_idx] = float(value)
         all_raw_feature.resize((user_id_map_size, 450))
         preprocessing.scale(all_raw_feature, copy=False)
+
         with open(join(feature_output_dir, 'all_feature'), 'w') as out_f:
             for user_id in user_id_map.keys():
                 user_id_idx = user_id_map[user_id]
-                out_f.write(user_id + '\t' + '\t'.join([str(x) for x in all_raw_feature[user_id_idx][:feature_id_map_size]]) + '\n')
+                out_f.write(user_id + '\t' + '\t'.join(
+                    [str(x) for x in all_raw_feature[user_id_idx][:feature_id_map_size]]) + '\t' + '\t'.join([str(x) for x in dev_raw_feature[user_id_idx]]) + '\n')
