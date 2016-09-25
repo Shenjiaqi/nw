@@ -154,6 +154,7 @@ class FeatureEvalGen:
                 for line in in_f:
                     line_cnt += 1
                     if (line_cnt % 100000000) == 0:
+                        print line_cnt
                     user_id, query_id, time = line.strip().split()
                     if query_id in self.feature_idx_gen.query_idx:
                         user_id_idx = self.all_user_id_idx[user_id]
@@ -170,6 +171,7 @@ class FeatureEvalGen:
                 for line in in_f:
                     line_cnt += 1
                     if (line_cnt % 100000000) == 0:
+                        print line_cnt
                     user_id, url_id, time = line.strip().split()
                     if url_id in self.feature_idx_gen.url_idx:
                         time = self.date_from_str(time)
