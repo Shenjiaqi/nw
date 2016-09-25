@@ -13,9 +13,9 @@ import numpy
 from numpy import zeros
 from scipy.sparse import csr_matrix
 
-from feature import AppUsage
-from feature.FearureIdxGen import FeatureIdxGen
-from feature.UserLabel import UserLabel
+from AppUsage import AppUsage
+from FearureIdxGen import FeatureIdxGen
+from UserLabel import UserLabel
 
 
 class FeatureEvalGen:
@@ -124,10 +124,14 @@ class FeatureEvalGen:
         user_id_feature_id_start_time = zeros((all_user_num, all_feature_num), dtype=numpy.int64)
         user_id_feature_id_end_time = zeros((all_user_num, all_feature_num), dtype=numpy.int64)
         # load from app usage
+        line_cnt = 0
         for file in os.listdir(self.app_usage_dir):
-            #print self.app_usage_dir, file
+            print self.app_usage_dir, file
             with open(join(self.app_usage_dir, file), 'r') as in_f:
                 for line in in_f:
+                    line_cnt += 1
+                    if (line_cnt % 100000000) == 0:
+                        print line_cnt
                     user_id, app_id, count, duration, time = line.strip().split()
 
                     if app_id in self.feature_idx_gen.appid_idx:
@@ -143,10 +147,14 @@ class FeatureEvalGen:
                         self.update_min_time(user_id_feature_id_start_time, user_id_idx, app_id_idx, time)
                         self.update_max_time(user_id_feature_id_end_time, user_id_idx, app_id_idx, time)
 
+        line_cnt = 0
         for file in os.listdir(self.query_dir):
-            #print self.query_dir, file
+            print self.query_dir, file
             with open(join(self.query_dir, file), 'r') as in_f:
                 for line in in_f:
+                    line_cnt += 1
+                    if (line_cnt % 100000000) == 0:
+                        print line_cnt
                     user_id, query_id, time = line.strip().split()
                     if query_id in self.feature_idx_gen.query_idx:
                         user_id_idx = self.all_user_id_idx[user_id]
@@ -156,10 +164,14 @@ class FeatureEvalGen:
                         self.update_min_time(user_id_feature_id_start_time, user_id_idx, query_id_idx, time)
                         self.update_max_time(user_id_feature_id_end_time, user_id_idx, query_id_idx, time)
 
+        line_cnt = 0
         for file in os.listdir(self.url_dir):
-            #print self.url_dir, file
+            print self.url_dir, file
             with open(join(self.url_dir, file), 'r') as in_f:
                 for line in in_f:
+                    line_cnt += 1
+                    if (line_cnt % 100000000) == 0:
+                        print line_cnt
                     user_id, url_id, time = line.strip().split()
                     if url_id in self.feature_idx_gen.url_idx:
                         time = self.date_from_str(time)
@@ -169,7 +181,7 @@ class FeatureEvalGen:
                         self.update_min_time(user_id_feature_id_start_time, user_id_idx, url_id_idx, time)
                         self.update_max_time(user_id_feature_id_end_time, user_id_idx, url_id_idx, time)
 
-        #print 'start time'
+        print 'start time'
         #print user_id_feature_id_start_time
         #print 'end time'
         #print user_id_feature_id_end_time
@@ -183,11 +195,11 @@ class FeatureEvalGen:
         user_id_feature_id_start_time = None
         user_id_feature_id_end_time = None
 
-        #print 'avg'
+        print 'avg'
         #print user_id_feature_id
 
         user_id_feature_id = preprocessing.scale(user_id_feature_id, copy=False)
-        #print 'norm'
+        print 'norm'
         #print user_id_feature_id
 
         device_brand_idx = {}
@@ -196,7 +208,7 @@ class FeatureEvalGen:
         device_model_idx = {}
         device_model_idx_cnt = 0
         device_model_col = self.feature_idx_gen.feature_counter + 1
-        #print device_brand_col, device_model_col, "########"
+        print device_brand_col, device_model_col, "########"
         for user_id in self.user_id_dev_info.keys():
             device_brand, device_model = self.user_id_dev_info[user_id]
             if device_brand not in device_brand_idx:
@@ -211,7 +223,7 @@ class FeatureEvalGen:
             user_id_feature_id[user_id_idx][device_brand_col] = device_brand_idx[device_brand]
             user_id_feature_id[user_id_idx][device_model_col] = device_model_idx[device_model]
 
-        #print 'dev'
+        print 'dev'
         #print user_id_feature_id
         feature_files = []
         tag_fiels = []
@@ -235,6 +247,8 @@ class FeatureEvalGen:
                         # no tag for submit
                         if b != 2:
                             tag_fiels[a][b].write(str(user_tag_getter[a](user_id)) + '\n')
+                        else:
+                            tag_fiels[a][b].write(str(user_id) + '\n')
         for i in feature_files:
             for j in i:
                 j.close()
@@ -338,7 +352,11 @@ if __name__ == '__main__':
     with open('data.json', 'r') as f:
         conf = json.load(f)
         feature_eval_gen = FeatureEvalGen(conf)
+        print 'load all labeled user'
         feature_eval_gen.load_all_labeled_user()
+        print 'load feature idx'
         feature_eval_gen.load_feature_idx()
+        print 'gen train eval user list'
         feature_eval_gen.gen_train_eval_user_list()
+        print 'write app usage'
         feature_eval_gen.write_feature_app_usage()

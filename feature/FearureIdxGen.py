@@ -6,10 +6,9 @@ from os.path import join
 class FeatureIdxGen:
     def __init__(self, conf):
         self.base_dir = conf['base_dir']
-        self.uv_dir = join(self.base_dir, conf['uv_dir'])
+        self.uv_dir = conf['uv_dir']
         self.uv_top100_appid_dir = join(self.uv_dir, conf['usage_top100_appid'])
         self.uv_install_top100_appid_dir = join(self.uv_dir, conf['install_top100_appid'])
-        self.uv_dir = join(self.base_dir, conf['uv_dir'])
         self.uv_url_top100_dir = join(self.uv_dir, conf['url_top100'])
         self.uv_query_top100_dir = join(self.uv_dir, conf['query_top100'])
         self.user_label_dir = join(self.base_dir, conf['user_label'])
@@ -21,6 +20,7 @@ class FeatureIdxGen:
 
     def add_appid_feature_idx(self):
         for i in [self.uv_top100_appid_dir, self.uv_install_top100_appid_dir]:
+            print self.uv_dir, i
             for j in os.listdir(i):
                 with open(join(i, j), 'r') as f:
                     for l in f:
@@ -31,6 +31,7 @@ class FeatureIdxGen:
 
     def add_query_feature_idx(self):
         for i in os.listdir(self.uv_query_top100_dir):
+            print join(self.uv_query_top100_dir, i)
             with open(join(self.uv_query_top100_dir, i), 'r') as f:
                 for l in f:
                     query_id = l.strip()
@@ -40,6 +41,7 @@ class FeatureIdxGen:
 
     def add_url_feature_idx(self):
         for i in os.listdir(self.uv_url_top100_dir):
+            print join(self.uv_url_top100_dir, i)
             with open(join(self.uv_url_top100_dir, i), 'r') as f:
                 for l in f:
                     url_id = l.strip()
