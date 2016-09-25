@@ -3,6 +3,10 @@ import os
 import shutil
 from os.path import join
 
+import numpy
+from numpy import zeros
+from sklearn import preprocessing
+
 
 class Normalizer:
     def __init__(self):
@@ -51,9 +55,30 @@ class Normalizer:
 if __name__ == '__main__':
     with open('data.json', 'r') as f:
         conf = json.load(f)
-        normalize = Normalizer()
         base_dir = conf['base_dir']
-        source_dir = join(base_dir, conf['feature_dir'])
-        target_dir = join(base_dir, conf['norm_feature_dir'])
-        normalize.normalize_age(file_dir=source_dir, target_dir=target_dir)
-        normalize.normalize_gender(file_dir=source_dir, target_dir=target_dir)
+        reduced_feature_dir = conf['reduced_dir']
+        feature_output_dir = conf['output_feature_base']
+        user_id_map = {}
+        user_id_map_size = 0
+        feature_id_map = {}
+        feature_id_map_size = 0
+        all_raw_feature = zeros((7634428+3804980, 450), dtype=numpy.float64)
+        for i in os.listdir(reduced_feature_dir):
+            with open(join(reduced_feature_dir, i), 'r') as in_f:
+                for line in in_f:
+                    user_id, feature_id, value = line.strip().split()
+                    if user_id not in user_id_map:
+                        user_id_map[user_id] = user_id_map_size
+                        user_id_map_size += 1
+                    if feature_id not in feature_id_map:
+                        feature_id_map[feature_id] = feature_id_map_size
+                        feature_id_map_size += 1
+                    user_id_idx = user_id_map[user_id]
+                    feature_id_idx = feature_id_map[feature_id]
+                    all_raw_feature[user_id_idx][feature_id_idx] = float(value)
+        all_raw_feature.resize((user_id_map_size, 450))
+        preprocessing.scale(all_raw_feature, copy=False)
+        with open(join(feature_output_dir, 'all_feature'), 'w') as out_f:
+            for user_id in user_id_map.keys():
+                user_id_idx = user_id_map[user_id]
+                out_f.write(user_id + '\t' + '\t'.join([str(x) for x in all_raw_feature[user_id_idx][:feature_id_map_size]]) + '\n')
