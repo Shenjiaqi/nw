@@ -15,8 +15,7 @@ class UserLabel:
         if user_id in self.user_info:
             print "Error duplicated user_id [", user_id, "]"
         else:
-            self.user_info[user_id] = {"gender": int(gender),
-                                       "age_group": int(age_group)}
+            self.user_info[user_id] = (gender, age_group)
             self.user_counter += 1
 
     def get_user_list(self):
@@ -36,10 +35,10 @@ class UserLabel:
         return None
 
     def get_user_age(self, user_id):
-        return self.user_info[user_id]['age_group']
+        return int(self.user_info[user_id][1])
 
     def get_user_gender(self, user_id):
-        return self.user_info[user_id]['gender']
+        return int(self.user_info[user_id][0])
 
     def load_data_from_base_dir(self, base_dir):
         self.load_data(base_dir)

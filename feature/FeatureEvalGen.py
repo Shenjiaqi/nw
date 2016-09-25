@@ -177,10 +177,13 @@ class FeatureEvalGen:
         #print 'end time'
         #print user_id_feature_id_end_time
         # val / time_diff
-        user_id_feature_id_end_time -= user_id_feature_id_start_time
+        for i in xrange(0, all_user_num):
+            for j in xrange(0, all_feature_num):
+                e = user_id_feature_id_end_time[i][j]
+                if e > 0:
+                    s = user_id_feature_id_start_time[i][j]
+                    user_id_feature_id /= (e - s + 1)
         user_id_feature_id_start_time = None
-        user_id_feature_id_end_time += 1
-        user_id_feature_id /= user_id_feature_id_end_time
         user_id_feature_id_end_time = None
 
         print 'avg'
