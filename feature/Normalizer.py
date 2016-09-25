@@ -59,15 +59,19 @@ if __name__ == '__main__':
         base_dir = conf['base_dir']
         reduced_feature_dir = conf['reduced_dir']
         feature_output_dir = conf['output_feature_dir']
+        if not os.path.exists(feature_output_dir):
+            os.makedirs(feature_output_dir)
         user_id_map = {}
         user_id_map_size = 0
         feature_id_map = {}
         feature_id_map_size = 0
         device_id_map = {}
         device_id_map_size = 0
-        all_raw_feature = zeros((12439410, 490), dtype=numpy.float64)
+        width = 490
+        all_raw_feature = zeros((12439410, width), dtype=numpy.float64)
         dev_raw_feature = zeros((all_raw_feature.shape[0], 2), numpy.float64)
         for i in os.listdir(reduced_feature_dir):
+            print i
             if i.startswith('device_'):
                 # device info do not need to be normalized
                 with open(join(reduced_feature_dir, i), 'r') as in_f:
@@ -95,7 +99,8 @@ if __name__ == '__main__':
                     user_id_idx = user_id_map[user_id]
                     feature_id_idx = feature_id_map[feature_id]
                     all_raw_feature[user_id_idx][feature_id_idx] = float(value)
-        all_raw_feature.resize((user_id_map_size, 450))
+        all_raw_feature.resize((user_id_map_size, width))
+        print all_raw_feature.shape
         preprocessing.scale(all_raw_feature, copy=False)
 
         with open(join(feature_output_dir, 'all_feature'), 'w') as out_f:

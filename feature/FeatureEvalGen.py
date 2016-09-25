@@ -53,7 +53,7 @@ class FeatureEvalGen:
         self.age_train_size = conf['age_train_size_each_category']
 
         self.app_usage_dir = join(self.base_dir, conf['contest_dataset_app_usage'])
-        #print self.app_usage_dir
+        # print self.app_usage_dir
 
         # user_id -> info
         self.user_info = {}
@@ -182,9 +182,9 @@ class FeatureEvalGen:
                         self.update_max_time(user_id_feature_id_end_time, user_id_idx, url_id_idx, time)
 
         print 'start time'
-        #print user_id_feature_id_start_time
-        #print 'end time'
-        #print user_id_feature_id_end_time
+        # print user_id_feature_id_start_time
+        # print 'end time'
+        # print user_id_feature_id_end_time
         # val / time_diff
         for i in xrange(0, all_user_num):
             for j in xrange(0, all_feature_num):
@@ -196,11 +196,11 @@ class FeatureEvalGen:
         user_id_feature_id_end_time = None
 
         print 'avg'
-        #print user_id_feature_id
+        # print user_id_feature_id
 
         user_id_feature_id = preprocessing.scale(user_id_feature_id, copy=False)
         print 'norm'
-        #print user_id_feature_id
+        # print user_id_feature_id
 
         device_brand_idx = {}
         device_brand_idx_cnt = 0
@@ -218,13 +218,13 @@ class FeatureEvalGen:
                 device_model_idx[device_model] = device_model_idx_cnt
                 device_model_idx_cnt += 1
             user_id_idx = self.all_user_id_idx[user_id]
-            #print "###", device_brand_idx[device_brand]
-            #print "@@@", device_model_idx[device_model]
+            # print "###", device_brand_idx[device_brand]
+            # print "@@@", device_model_idx[device_model]
             user_id_feature_id[user_id_idx][device_brand_col] = device_brand_idx[device_brand]
             user_id_feature_id[user_id_idx][device_model_col] = device_model_idx[device_model]
 
-        print 'dev'
-        #print user_id_feature_id
+        print 'device'
+        # print user_id_feature_id
         feature_files = []
         tag_fiels = []
         for i in self.output_feature_dir:
@@ -337,12 +337,11 @@ class FeatureEvalGen:
                         self.all_user_id_idx[user_id] = all_user_id_cnt
                         all_user_id_cnt += 1
 
-        #print 'all_user_id_idx:'
-        #print self.all_user_id_idx
-        #print 'feature:'
-        #for i in self.feature:
-#            print i
-
+                        # print 'all_user_id_idx:'
+                        # print self.all_user_id_idx
+                        # print 'feature:'
+                        # for i in self.feature:
+                        #            print i
 
     def load_all_labeled_user(self):
         self.user_label.load_data_from_base_dir(self.user_label_dir)
@@ -351,12 +350,120 @@ class FeatureEvalGen:
 if __name__ == '__main__':
     with open('data.json', 'r') as f:
         conf = json.load(f)
-        feature_eval_gen = FeatureEvalGen(conf)
-        print 'load all labeled user'
-        feature_eval_gen.load_all_labeled_user()
-        print 'load feature idx'
-        feature_eval_gen.load_feature_idx()
-        print 'gen train eval user list'
-        feature_eval_gen.gen_train_eval_user_list()
-        print 'write app usage'
-        feature_eval_gen.write_feature_app_usage()
+        base_dir = conf['base_dir']
+        gender_train_size = conf['gender_train_size_each_category']
+        age_train_size = conf['age_train_size_each_category']
+        test_data_dir = join(base_dir, conf['test_data_dir'])
+        full_feature_dir = conf['output_feature_dir']
+        output_feature_base = conf['classified_feature_dir']
+        gender_train_output_feature_dir = join(output_feature_base, conf['gender_train_output_feature_dir'])
+        gender_eval_output_feature_dir = join(output_feature_base, conf['gender_eval_output_feature_dir'])
+        gender_submit_output_feature_dir = join(output_feature_base, conf['gender_submit_output_feature_dir'])
+
+        age_train_output_feature_dir = join(output_feature_base, conf['age_train_output_feature_dir'])
+        age_eval_output_feature_dir = join(output_feature_base, conf['age_eval_output_feature_dir'])
+        age_submit_output_feature_dir = join(output_feature_base, conf['age_submit_output_feature_dir'])
+
+        output_feature_dir = [[gender_train_output_feature_dir, gender_eval_output_feature_dir,
+                               gender_submit_output_feature_dir],
+                              [age_train_output_feature_dir, age_eval_output_feature_dir,
+                               age_submit_output_feature_dir]]
+
+        feature_files = []
+        tag_files = []
+        for i in output_feature_dir:
+            ff = []
+            tf = []
+            for j in i:
+                if not os.path.exists(j):
+                    os.makedirs(j)
+                ff.append(open(join(j, 'feature'), 'w'))
+                tf.append(open(join(j, 'tag'), 'w'))
+            feature_files.append(ff)
+            tag_files.append(tf)
+
+        user_label = UserLabel()
+        user_label.load_data_from_base_dir(join(base_dir, conf['user_label']))
+        all_gender_feature = [[]]
+        for i in xrange(1, 3):
+            all_gender_feature.append([])
+        all_age_feature = [[]]
+        for i in xrange(1, 8):
+            all_age_feature.append([])
+        for user_id in user_label.user_info.keys():
+            gender = user_label.get_user_gender(user_id)
+            age = user_label.get_user_age(user_id)
+
+            all_gender_feature[gender].append(user_id)
+            all_age_feature[age].append(user_id)
+
+        # shuffle
+        for i in [all_age_feature, all_gender_feature]:
+            l_i = len(i)
+            for j in xrange(0, l_i):
+                len_j = len(i[j])
+                for k in xrange(0, len_j):
+                    nk = random.randint(k, len_j - 1)
+                    if k == nk:
+                        continue
+                    tmp = i[j][k]
+                    i[j][k] = i[j][nk]
+                    i[j][nk] = tmp
+
+        train_gender_feature = {}
+        eval_gender_feature = {}
+        train_age_feature = {}
+        eval_age_feature = {}
+        # insert train and eval feature dict
+        for j in xrange(1, 3):
+            l_j = len(all_gender_feature[j])
+            for k in xrange(0, l_j):
+                u_id = all_gender_feature[j][k]
+                if k < gender_train_size:
+                    train_gender_feature[u_id] = j
+                else:
+                    eval_gender_feature[u_id] = j
+        for i in xrange(1, 8):
+            l_j = len(all_age_feature[i])
+            for j in xrange(0, l_j):
+                u_id = all_age_feature[i][j]
+                if j < age_train_size:
+                    train_age_feature[u_id] = i
+                else:
+                    eval_age_feature[u_id] = i
+
+        submit_gender_feature = {}
+        submit_age_feature = {}
+
+        feature = [
+            [train_gender_feature, eval_gender_feature, submit_gender_feature],
+            [train_age_feature, eval_age_feature, submit_age_feature]]
+
+        for i in os.listdir(test_data_dir):
+            with open(join(test_data_dir, i), 'r') as f:
+                for line in f:
+                    user_id = line.strip()
+                    submit_gender_feature[user_id] = 0
+                    submit_age_feature[user_id] = 0
+
+        user_tag_getter = [user_label.get_user_gender, user_label.get_user_age]
+        print full_feature_dir
+        for i in os.listdir(full_feature_dir):
+            with open(join(full_feature_dir, i), 'r') as in_f:
+                for line in in_f:
+                    fields = line.strip().split()
+                    user_id = fields[0]
+                    fields = fields[1:]
+                    for a in [0, 1]:
+                        for b in [0, 1, 2]:
+                            if user_id in feature[a][b]:
+                                feature_files[a][b].write(line)
+                                if b != 2:
+                                    tag_files[a][b].write(str(user_tag_getter[a](user_id)) + '\n')
+                                else:
+                                    tag_files[a][b].write(str(user_id) + '\n')
+
+        for a in [0, 1]:
+            for b in [0, 1, 2]:
+                feature_files[a][b].close()
+                tag_files[a][b].close()
