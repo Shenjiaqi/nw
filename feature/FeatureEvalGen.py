@@ -124,10 +124,14 @@ class FeatureEvalGen:
         user_id_feature_id_start_time = zeros((all_user_num, all_feature_num), dtype=numpy.int64)
         user_id_feature_id_end_time = zeros((all_user_num, all_feature_num), dtype=numpy.int64)
         # load from app usage
+        line_cnt = 0
         for file in os.listdir(self.app_usage_dir):
             print self.app_usage_dir, file
             with open(join(self.app_usage_dir, file), 'r') as in_f:
                 for line in in_f:
+                    line_cnt += 1
+                    if (line_cnt % 100000000) == 0:
+                        print line_cnt
                     user_id, app_id, count, duration, time = line.strip().split()
 
                     if app_id in self.feature_idx_gen.appid_idx:
@@ -142,12 +146,14 @@ class FeatureEvalGen:
                         user_id_feature_id[user_id_idx][app_id_idx + 1] += count
                         self.update_min_time(user_id_feature_id_start_time, user_id_idx, app_id_idx, time)
                         self.update_max_time(user_id_feature_id_end_time, user_id_idx, app_id_idx, time)
-                break
 
+        line_cnt = 0
         for file in os.listdir(self.query_dir):
             print self.query_dir, file
             with open(join(self.query_dir, file), 'r') as in_f:
                 for line in in_f:
+                    line_cnt += 1
+                    if (line_cnt % 100000000) == 0:
                     user_id, query_id, time = line.strip().split()
                     if query_id in self.feature_idx_gen.query_idx:
                         user_id_idx = self.all_user_id_idx[user_id]
@@ -156,12 +162,14 @@ class FeatureEvalGen:
                         user_id_feature_id[user_id_idx][query_id_idx] += 1.0
                         self.update_min_time(user_id_feature_id_start_time, user_id_idx, query_id_idx, time)
                         self.update_max_time(user_id_feature_id_end_time, user_id_idx, query_id_idx, time)
-                break
 
+        line_cnt = 0
         for file in os.listdir(self.url_dir):
             print self.url_dir, file
             with open(join(self.url_dir, file), 'r') as in_f:
                 for line in in_f:
+                    line_cnt += 1
+                    if (line_cnt % 100000000) == 0:
                     user_id, url_id, time = line.strip().split()
                     if url_id in self.feature_idx_gen.url_idx:
                         time = self.date_from_str(time)
@@ -170,7 +178,6 @@ class FeatureEvalGen:
                         user_id_feature_id[user_id_idx][url_id_idx] += 1.0
                         self.update_min_time(user_id_feature_id_start_time, user_id_idx, url_id_idx, time)
                         self.update_max_time(user_id_feature_id_end_time, user_id_idx, url_id_idx, time)
-                break
 
         print 'start time'
         #print user_id_feature_id_start_time
