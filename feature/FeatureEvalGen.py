@@ -448,20 +448,30 @@ if __name__ == '__main__':
 
         user_tag_getter = [user_label.get_user_gender, user_label.get_user_age]
         print full_feature_dir
-        for i in os.listdir(full_feature_dir):
-            with open(join(full_feature_dir, i), 'r') as in_f:
-                for line in in_f:
-                    fields = line.strip().split()
-                    user_id = fields[0]
-                    fields = fields[1:]
-                    for a in [0, 1]:
-                        for b in [0, 1, 2]:
-                            if user_id in feature[a][b]:
-                                feature_files[a][b].write(line)
-                                if b != 2:
-                                    tag_files[a][b].write(str(user_tag_getter[a](user_id)) + '\n')
-                                else:
-                                    tag_files[a][b].write(str(user_id) + '\n')
+        f = [open(join(full_feature_dir, x), 'r') for x in
+             ['app_usage_all_feature', 'url_all_feature', 'query_all_feature', 'all_dev_feature']]
+        while True:
+            l = f[0].readline()
+            if l == '':
+                break
+            l = l.strip()
+            fields1 = l.split()
+            fields2 = f[1].readline().strip().split()
+            fields3 = f[2].readline().strip().split()
+
+            user_id = fields1[0]
+            assert user_id == fields2[0]
+            assert user_id == fields2[0]
+
+            line = l + '\t' + '\t'.join(fields2[1:]) + '\t' + '\t'.join(fields3[1:]) + '\n'
+            for a in [0, 1]:
+                for b in [0, 1, 2]:
+                    if user_id in feature[a][b]:
+                        feature_files[a][b].write(line)
+                        if b != 2:
+                            tag_files[a][b].write(str(user_tag_getter[a](user_id)) + '\n')
+                        else:
+                            tag_files[a][b].write(str(user_id) + '\n')
 
         for a in [0, 1]:
             for b in [0, 1, 2]:
