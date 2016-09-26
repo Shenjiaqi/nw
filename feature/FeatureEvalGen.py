@@ -466,12 +466,15 @@ if __name__ == '__main__':
             line = l + '\t' + '\t'.join(fields2[1:]) + '\t' + '\t'.join(fields3[1:]) + '\n'
             for a in [0, 1]:
                 for b in [0, 1, 2]:
+                    cnt = 0
                     if user_id in feature[a][b]:
+                        cnt += 1
                         feature_files[a][b].write(line)
                         if b != 2:
                             tag_files[a][b].write(str(user_tag_getter[a](user_id)) + '\n')
                         else:
                             tag_files[a][b].write(str(user_id) + '\n')
+                        assert cnt == 1
 
         for a in [0, 1]:
             for b in [0, 1, 2]:
