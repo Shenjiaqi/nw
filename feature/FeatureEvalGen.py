@@ -458,12 +458,14 @@ if __name__ == '__main__':
             fields1 = l.split()
             fields2 = f[1].readline().strip().split()
             fields3 = f[2].readline().strip().split()
+            fields4 = f[3].readline().strip().split()
 
             user_id = fields1[0]
             assert user_id == fields2[0]
             assert user_id == fields2[0]
+            assert user_id == fields3[0]
 
-            line = l + '\t' + '\t'.join(fields2[1:]) + '\t' + '\t'.join(fields3[1:]) + '\n'
+            line = l + '\t' + '\t'.join(fields2[1:]) + '\t' + '\t'.join(fields3[1:]) + '\t' + '\t'.join(fields4[1:]) + '\n'
             for a in [0, 1]:
                 for b in [0, 1, 2]:
                     cnt = 0
