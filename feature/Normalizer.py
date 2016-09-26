@@ -67,15 +67,27 @@ if __name__ == '__main__':
         feature_id_map_size = 0
         device_id_map = {}
         device_id_map_size = 0
-        width = 490
+        width = 400
         all_raw_feature = zeros((12439410, width), dtype=numpy.float64)
         dev_raw_feature = zeros((all_raw_feature.shape[0], 2), numpy.float64)
+        line_cnt = 0
+        with open(join(reduced_feature_dir, 'device_feature'), 'r') as in_f:
+            for line in in_f:
+                user_id, a, b = line.strip().split()
+                if user_id not in user_id_map:
+                    user_id_map[user_id] = user_id_map_size
+                    user_id_map_size += 1
+                
         for i in os.listdir(reduced_feature_dir):
             print i
             if i.startswith('device_'):
+                continue
                 # device info do not need to be normalized
                 with open(join(reduced_feature_dir, i), 'r') as in_f:
                     for line in in_f:
+                        line_cnt += 1
+                        if (line_cnt % 1000000) == 0:
+                            print line_cnt
                         user_id, dev_feature_id, value = line.split()
                         if user_id not in user_id_map:
                             user_id_map[user_id] = user_id_map_size
@@ -89,22 +101,25 @@ if __name__ == '__main__':
                 continue
             with open(join(reduced_feature_dir, i), 'r') as in_f:
                 for line in in_f:
+                    line_cnt += 1
+                    if (line_cnt % 1000000) == 0:
+                        print line_cnt
                     user_id, feature_id, value = line.strip().split()
-                    if user_id not in user_id_map:
-                        user_id_map[user_id] = user_id_map_size
-                        user_id_map_size += 1
                     if feature_id not in feature_id_map:
                         feature_id_map[feature_id] = feature_id_map_size
                         feature_id_map_size += 1
                     user_id_idx = user_id_map[user_id]
                     feature_id_idx = feature_id_map[feature_id]
                     all_raw_feature[user_id_idx][feature_id_idx] = float(value)
+        print 'resize'
         all_raw_feature.resize((user_id_map_size, width))
         print all_raw_feature.shape
         preprocessing.scale(all_raw_feature, copy=False)
+        print 'norm done'
 
         with open(join(feature_output_dir, 'all_feature'), 'w') as out_f:
             for user_id in user_id_map.keys():
                 user_id_idx = user_id_map[user_id]
                 out_f.write(user_id + '\t' + '\t'.join(
-                    [str(x) for x in all_raw_feature[user_id_idx][:feature_id_map_size]]) + '\t' + '\t'.join([str(x) for x in dev_raw_feature[user_id_idx]]) + '\n')
+                    #[str(x) for x in all_raw_feature[user_id_idx][:feature_id_map_size]]) + '\t' + '\t'.join([str(x) for x in dev_raw_feature[user_id_idx]]) + '\n')
+                    [str(x) for x in all_raw_feature[user_id_idx][:feature_id_map_size]]) + '\n')
