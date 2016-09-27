@@ -2,6 +2,7 @@ import json
 import os
 from os.path import join
 import sys
+import numpy
 
 # from train import FeatureLoader
 from numpy import zeros
@@ -126,9 +127,9 @@ if __name__ == '__main__':
             tags_files.append(t)
 
 
-        for estimators in [100]:
-            for samples_split in [5]:
-                for max_depth in [10]:
+        for estimators in [500 ]:
+            for samples_split in [20]:
+                for max_depth in [20]:
                     for samples_leaf in [10]:
                         for i in feature_files:
                             for j in i:
@@ -156,12 +157,13 @@ if __name__ == '__main__':
                             field_width = 0
                             for l in feature_files[i_file][0]:
                                 feature_line_cnt += 1
-                                if feature_line_cnt % 1000000 == 0:
-                                    print "feature line: " + str(feature_line_cnt)
                                 fields = l.strip().split()
-                                if train_feature == None:
+                                if train_feature is None:
                                     field_width = len(fields) - 1
-                                    train_feature = zeros((6000001, field_width))
+                                    train_feature = zeros((6000001, field_width), dtype=numpy.float64)
+                                if feature_line_cnt % 10000 == 0:
+                                    print "feature line: " + str(feature_line_cnt)
+                                    print str(train_feature.nbytes/1024/1024/1024) + "G"
                                 for i in xrange(0, field_width):
                                     train_feature[feature_line_cnt - 1][i] = float(fields[i+1])
                             train_feature.resize((feature_line_cnt, field_width))
@@ -170,12 +172,19 @@ if __name__ == '__main__':
                             for l in tags_files[i_file][0]:
                                 tag.append(int(l.strip()))
 
-                            rf = RandomForestClassifier(n_jobs=20, n_estimators=estimators,
+                            rf = RandomForestClassifier(n_jobs=30, n_estimators=estimators,
                                                         min_samples_split=samples_split,
                                                         max_depth=max_depth,
                                                         min_samples_leaf=samples_leaf)
 
                             rf.fit(train_feature, tag)
+                            '''
+                            with open(join(eval_dir, 't_data'), 'wb') as f:
+                                pickle.dump(train_feature, f, pickle.HIGHEST_PROTOCOL)
+                            with open(join(eval_dir, 't_tag'), 'wb') as f:
+                                pickle.dump(tag, f, pickle.HIGHEST_PROTOCOL)
+                            '''
+
                             train_feature = None
                             tag = []
 
@@ -187,32 +196,43 @@ if __name__ == '__main__':
                             for i in xrange(0, 8):
                                 wrong_file.append(open(join(eval_dir, 'f_' + str(i)), 'w'))
                             eval_cnt = 0
+                            eval_max_cnt = 1000000
+                            eval_feature = zeros((eval_max_cnt, field_width), dtype=numpy.float64)
+                            eval_tag = []
+                            user_id = []
                             for l in feature_files[i_file][1]:
-                                eval_cnt += 1
-                                if eval_cnt > 1000000:
+                                if eval_cnt >= eval_max_cnt:
                                     break
+                                eval_cnt += 1
                                 if eval_cnt % 10000 == 0:
                                     print "eval: " + str(eval_cnt)
                                 fields = l.strip().split()
-                                user_id = fields[0]
-                                feature = [float(x) for x in fields[1:]]
-                                tag_i = int(tags_files[i_file][1].readline().strip())
-                                eval_result = rf.predict_proba([feature])
+                                user_id.append(fields[0])
+                                for i in xrange(0, field_width):
+                                    eval_feature[eval_cnt-1][i] = float(fields[i+1])
+                                eval_tag.append(int(tags_files[i_file][1].readline().strip()))
+
+                            eval_feature.resize((eval_cnt, field_width))
+                            eval_result = rf.predict_proba(eval_feature)
+                            for i in xrange(0, eval_cnt):
                                 j = 0
-                                for k in xrange(0, len(eval_result[0])):
-                                    if eval_result[0][k] > eval_result[0][j]:
+                                for k in xrange(0, len(eval_result[i])):
+                                    if eval_result[i][k] > eval_result[i][j]:
                                         j = k
                                 j += 1
-                                result_str = user_id + '\t' + '\t'.join([str(x) for x in eval_result]) + '\n'
-                                act = [0 for x in xrange(0, len(eval_result[0]))]
+                                result_str = user_id[i] + '\t' + '\t'.join([str(x) for x in eval_result[i]]) + '\n'
+                                act = [0 for x in xrange(0, field_width)]
                                 act[tag_i - 1] = 1
-                                loglosssum += logloss(act, eval_result[0])
+                                loglosssum += logloss(act, eval_result[i])
                                 num += 1.0
                                 if j != tag_i:
                                     wrong_file[j].write(result_str)
                                 else:
                                     right_file.write(result_str)
                             avg_log_loss = loglosssum / (num + 0.00000001)
+                            eval_feature = None
+                            eval_tag = None
+                            user_id = None
                             with open(join(eval_dir, 'log_logss'), 'w') as out_f:
                                 out_f.write(str(avg_log_loss))
                             for i in wrong_file:
