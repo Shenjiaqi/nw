@@ -150,15 +150,22 @@ if __name__ == '__main__':
                             submit_file = join(output_dir, 'submit')
                             # train feature
 
-                            train_feature = []
+                            train_feature = None
                             tag = []
                             feature_line_cnt = 0
+                            field_width = 0
                             for l in feature_files[i_file][0]:
                                 feature_line_cnt += 1
                                 if feature_line_cnt % 1000000 == 0:
                                     print "feature line: " + str(feature_line_cnt)
                                 fields = l.strip().split()
-                                train_feature.append([float(x) for x in fields[1:]])
+                                if train_feature == None:
+                                    field_width = len(fields) - 1
+                                    train_feature = zeros((6000001, field_width))
+                                for i in xrange(0, field_width):
+                                    train_feature[feature_line_cnt - 1][i] = float(fields[i+1])
+                            train_feature.resize((feature_line_cnt, field_width))
+                            print feature_line_cnt, field_width
                             # train tag
                             for l in tags_files[i_file][0]:
                                 tag.append(int(l.strip()))
