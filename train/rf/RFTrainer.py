@@ -127,8 +127,8 @@ if __name__ == '__main__':
             tags_files.append(t)
 
 
-        for estimators in [500 ]:
-            for samples_split in [20]:
+        for estimators in [400]:
+            for samples_split in [10]:
                 for max_depth in [20]:
                     for samples_leaf in [10]:
                         for i in feature_files:
@@ -196,7 +196,7 @@ if __name__ == '__main__':
                             for i in xrange(0, 8):
                                 wrong_file.append(open(join(eval_dir, 'f_' + str(i)), 'w'))
                             eval_cnt = 0
-                            eval_max_cnt = 1000000
+                            eval_max_cnt = 100000
                             eval_feature = zeros((eval_max_cnt, field_width), dtype=numpy.float64)
                             eval_tag = []
                             user_id = []
@@ -204,7 +204,7 @@ if __name__ == '__main__':
                                 if eval_cnt >= eval_max_cnt:
                                     break
                                 eval_cnt += 1
-                                if eval_cnt % 10000 == 0:
+                                if eval_cnt % 100000 == 0:
                                     print "eval: " + str(eval_cnt)
                                 fields = l.strip().split()
                                 user_id.append(fields[0])
@@ -221,11 +221,11 @@ if __name__ == '__main__':
                                         j = k
                                 j += 1
                                 result_str = user_id[i] + '\t' + '\t'.join([str(x) for x in eval_result[i]]) + '\n'
-                                act = [0 for x in xrange(0, field_width)]
-                                act[tag_i - 1] = 1
+                                act = [0 for x in xrange(0, eval_result.shape[1])]
+                                act[eval_tag[i] - 1] = 1
                                 loglosssum += logloss(act, eval_result[i])
                                 num += 1.0
-                                if j != tag_i:
+                                if j != eval_tag[i]:
                                     wrong_file[j].write(result_str)
                                 else:
                                     right_file.write(result_str)
@@ -238,11 +238,19 @@ if __name__ == '__main__':
                             for i in wrong_file:
                                 i.close()
                             right_file.close()
+                            submit_feature = zeros((100000, field_width), dtype=numpy.float64)
+                            submit_cnt = 0
+                            submit_user_id = []
                             with open(submit_file, 'w') as out_f:
                                 for l in feature_files[i_file][2]:
+                                    submit_cnt += 1
                                     fields = l.strip().split()
-                                    result = rf.predict([fields[1:]])
-                                    out_f.write(fields[0] + ',' + ','.join([str(x) for x in result]) + '\n')
+                                    submit_user_id.append(fields[0])
+                                    for i in xrange(0, field_width):
+                                        submit_feature[submit_cnt-1][i] = float(fields[1 + i])
+                                result = rf.predict_proba(submit_feature)
+                                for i in xrange(0, submit_cnt):
+                                    out_f.write(submit_user_id[i] + ',' + ','.join([str(x) for x in result[i]]) + '\n')
 
-                            with open(join(eval_dir, 'model'), 'w') as f:
-                                pickle.dump(rf, f)
+                            #with open(join(eval_dir, 'model'), 'w') as f:
+                            #    pickle.dump(rf, f)
