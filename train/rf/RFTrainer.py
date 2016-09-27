@@ -116,23 +116,27 @@ if __name__ == '__main__':
         final_output_dir = conf['final_eval_dir']
         feature_files = []
         tags_files = []
-        user_files = []
         for i in output_feature_dir:
             f = []
             t = []
-            u = []
             for j in i:
-                f.append(open(join(j, 'feature.pickle'), 'rb'))
-                t.append(open(join(j, 'tag.pickle'), 'rb'))
-                u.append(open(join(j, 'user_id.pickle'), 'rb'))
+                f.append(open(join(j, 'feature'), 'r'))
+                t.append(open(join(j, 'tag'), 'r'))
+
             feature_files.append(f)
             tags_files.append(t)
-            user_files.append(u)
 
-        for estimators in [10]:
-            for samples_split in [2]:
+
+        for estimators in [500 ]:
+            for samples_split in [20]:
                 for max_depth in [20]:
-                    for samples_leaf in [2]:
+                    for samples_leaf in [10]:
+                        for i in feature_files:
+                            for j in i:
+                                j.seek(0)
+                        for i in tags_files:
+                            for j in i:
+                                j.seek(0)
                         for i_file in [0, 1]:
                             out_dir = join(final_output_dir, 'est_n' + str(estimators) +
                                            'split' + str(samples_split) +
@@ -147,16 +151,39 @@ if __name__ == '__main__':
                             submit_file = join(output_dir, 'submit')
                             # train feature
 
-                            train_feature = pickle.load(feature_files[i_file][0])
-                            field_witdh = train_feature.shape[1]
-                            tag = pickle.load(tags_files[i_file][0])
-                            #user = pickle.load(user_files[i_file][0])
+                            train_feature = None
+                            tag = []
+                            feature_line_cnt = 0
+                            field_width = 0
+                            for l in feature_files[i_file][0]:
+                                feature_line_cnt += 1
+                                fields = l.strip().split()
+                                if train_feature is None:
+                                    field_width = len(fields) - 1
+                                    train_feature = zeros((6000001, field_width), dtype=numpy.float64)
+                                if feature_line_cnt % 10000 == 0:
+                                    print "feature line: " + str(feature_line_cnt)
+                                    print str(train_feature.nbytes/1024/1024/1024) + "G"
+                                for i in xrange(0, field_width):
+                                    train_feature[feature_line_cnt - 1][i] = float(fields[i+1])
+                            train_feature.resize((feature_line_cnt, field_width))
+                            print feature_line_cnt, field_width
+                            # train tag
+                            for l in tags_files[i_file][0]:
+                                tag.append(int(l.strip()))
+
                             rf = RandomForestClassifier(n_jobs=30, n_estimators=estimators,
                                                         min_samples_split=samples_split,
                                                         max_depth=max_depth,
                                                         min_samples_leaf=samples_leaf)
 
                             rf.fit(train_feature, tag)
+                            '''
+                            with open(join(eval_dir, 't_data'), 'wb') as f:
+                                pickle.dump(train_feature, f, pickle.HIGHEST_PROTOCOL)
+                            with open(join(eval_dir, 't_tag'), 'wb') as f:
+                                pickle.dump(tag, f, pickle.HIGHEST_PROTOCOL)
+                            '''
 
                             train_feature = None
                             tag = []
@@ -168,11 +195,25 @@ if __name__ == '__main__':
                             num = 0.0
                             for i in xrange(0, 8):
                                 wrong_file.append(open(join(eval_dir, 'f_' + str(i)), 'w'))
-                            eval_feature = pickle.load(feature_files[i_file][1])
+                            eval_cnt = 0
+                            eval_max_cnt = 1000000
+                            eval_feature = zeros((eval_max_cnt, field_width), dtype=numpy.float64)
+                            eval_tag = []
+                            user_id = []
+                            for l in feature_files[i_file][1]:
+                                if eval_cnt >= eval_max_cnt:
+                                    break
+                                eval_cnt += 1
+                                if eval_cnt % 10000 == 0:
+                                    print "eval: " + str(eval_cnt)
+                                fields = l.strip().split()
+                                user_id.append(fields[0])
+                                for i in xrange(0, field_width):
+                                    eval_feature[eval_cnt-1][i] = float(fields[i+1])
+                                eval_tag.append(int(tags_files[i_file][1].readline().strip()))
+
+                            eval_feature.resize((eval_cnt, field_width))
                             eval_result = rf.predict_proba(eval_feature)
-                            eval_cnt = eval_feature.shape[0]
-                            user_id = pickle.load(user_files[i_file][1])
-                            eval_tag = pickle.load(tags_files[i_file][1])
                             for i in xrange(0, eval_cnt):
                                 j = 0
                                 for k in xrange(0, len(eval_result[i])):
@@ -180,14 +221,15 @@ if __name__ == '__main__':
                                         j = k
                                 j += 1
                                 result_str = user_id[i] + '\t' + '\t'.join([str(x) for x in eval_result[i]]) + '\n'
-                                act = [0 for x in xrange(0, eval_result.shape[1])]
-                                act[eval_tag[i] - 1] = 1
+                                act = [0 for x in xrange(0, field_width)]
+                                act[tag_i - 1] = 1
                                 loglosssum += logloss(act, eval_result[i])
-                                if j != eval_tag[i]:
+                                num += 1.0
+                                if j != tag_i:
                                     wrong_file[j].write(result_str)
                                 else:
                                     right_file.write(result_str)
-                            avg_log_loss = loglosssum / (eval_feature.shape[0] + 0.0000000000001)
+                            avg_log_loss = loglosssum / (num + 0.00000001)
                             eval_feature = None
                             eval_tag = None
                             user_id = None
@@ -196,10 +238,11 @@ if __name__ == '__main__':
                             for i in wrong_file:
                                 i.close()
                             right_file.close()
-
-                            submit_feature = pickle.load(feature_files[i_file][2])
-                            user_id = pickle.load(user_files[i_file][2])
-                            result = rf.predict_proba(submit_feature)
                             with open(submit_file, 'w') as out_f:
-                                for i in xrange(0, submit_feature.shape[0]):
-                                    out_f.write(user_id[i] + ',' + ','.join([str(x) for x in result[i]]) + '\n')
+                                for l in feature_files[i_file][2]:
+                                    fields = l.strip().split()
+                                    result = rf.predict([fields[1:]])
+                                    out_f.write(fields[0] + ',' + ','.join([str(x) for x in result]) + '\n')
+
+                            with open(join(eval_dir, 'model'), 'w') as f:
+                                pickle.dump(rf, f)
